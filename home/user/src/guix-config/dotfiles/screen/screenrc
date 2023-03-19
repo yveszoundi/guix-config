@@ -1,0 +1,10 @@
+startup_message off
+shell -$SHELL
+vbell off
+defscrollback 10000
+escape ^Jj
+hardstatus alwayslastline
+attrcolor b ".I"
+defbce "on"
+hardstatus alwayslastline "%-Lw%{= BW}%50>%n%f* %t%{-}%+Lw%<  %=% [%{=b)%{Y}%l%{g}]"
+term xterm-256color 

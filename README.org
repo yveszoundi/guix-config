@@ -1,0 +1,189 @@
+#+TITLE: README
+
+This document describes my [[https://guix.gnu.org/][Gnu Guix System]] setup for a virtual machine installation ([[https://www.qemu.org/][QEMU]] for me).
+- This is for a =UEFI= installation that can be performed remotely via SSH (easy copy/paste of notes, etc.)
+- The installation uses [[https://btrfs.readthedocs.io/en/latest/][BTRFS]] instead of [[https://wikiless.org/wiki/Logical_Volume_Manager_(Linux)?lang=en][LVM]], with full disk encryption ([[https://wikiless.org/wiki/Linux_Unified_Key_Setup?lang=en][LUKS]])
+- The core installation is minimal
+  - Only new basic utilities are globally installed
+  - You're expected to add additional softare for a given non-admin user (called =user= in this guide)
+    - I use the [[https://guix.gnu.org/manual/en/html_node/Home-Configuration.html][Guix home environments support]] to easily manage my user-level setup
+    - I prefer a simple "hackable" window manager instead of a full desktop
+      - I'm experimenting with [[https://wayland.freedesktop.org/][Wayland]] lately instead of [[https://www.x.org/wiki/][X.Org]]
+      - For now, I'm more comfortable with [[https://github.com/djpohly/dwl/][DWL]] which is essentially a [[https://dwm.suckless.org/][dwm]] =Wayland= port
+
+My initial goal is to contribute to Open Source projects from a Guix environment.
+- My main machine runs few dedicated virtual machines (VM) a la [[https://www.qubes-os.org/intro/][Qubes OS]] (=vault-vm=, =personal-vm=, =dev-vm=, etc.)
+- Gnu Guix System would be dedicated to open source contributions
+  
+* Enable remote installation
+
+After booting the [[https://guix.gnu.org/en/download/][Gnu Guix System ISO image]], please start SSH and setup a non-empty root password for remote access.
+
+#+begin_src sh
+  herd start ssh-daemon
+  passwd
+#+end_src
+
+* Prepare the installation
+
+You can "ssh into" the Gnu Guix System installation: =ssh root@ip_here -p port_here=.
+
+For new installations with =QEMU=, I typically [[https://serverfault.com/questions/704294/qemu-multiple-port-forwarding][forward port]] 22 to a fixed port number.
+
+** Create partitions
+Identify your disk partitions (=fdisk -l= can help).
+
+Create 2 partitions by running (=cgdisk /dev/sda= in my case)
+- Setup the EFI partition (code =ef00=) of 300 MB (=/dev/sda1= in my case)
+- Setup the Linux partition (default code) with the remaining disk space (=/dev/sda2= in my case)
+
+Write changes to disk and quit =cgdisk=.
+
+** Create an encrypted device
+
+Encrypt the main partition.
+
+#+begin_src sh
+  cryptsetup luksFormat --type luks1 /dev/sda2
+#+end_src
+
+** Open LUKS device
+
+Open the encrypted device.
+
+#+begin_src sh
+  cryptsetup luksOpen /dev/sda2 guixsdvm
+#+end_src
+
+** Prepare installation
+
+Run all the commands below to configure partitions and setup filesystems.
+
+#+begin_src sh
+  mkfs.btrfs -L guixroot /dev/mapper/guixsdvm
+
+  mount -t btrfs /dev/mapper/guixsdvm /mnt
+
+  btrfs subvolume create /mnt/root
+  btrfs subvolume create /mnt/boot
+  btrfs subvolume create /mnt/home
+  btrfs subvolume create /mnt/gnu
+  btrfs subvolume create /mnt/data
+  btrfs subvolume create /mnt/log
+  btrfs subvolume create /mnt/swap
+
+  btrfs filesystem mkswapfile --size 4g /mnt/swap/swapfile
+  btrfs subvolume snapshot -r /mnt/root /mnt/root-blank
+
+  umount /mnt
+
+  mount -o subvol=root /dev/mapper/guixsdvm /mnt
+  mkdir -p /mnt/home /mnt/gnu /mnt/data /mnt/var/log /mnt/boot /mnt/swap
+  mount -o subvol=home /dev/mapper/guixsdvm /mnt/home
+  mount -o subvol=gnu  /dev/mapper/guixsdvm /mnt/gnu
+  mount -o subvol=data /dev/mapper/guixsdvm /mnt/data
+  mount -o subvol=log  /dev/mapper/guixsdvm /mnt/var/log
+  mount -o subvol=boot /dev/mapper/guixsdvm /mnt/boot
+  mount -o subvol=swap /dev/mapper/guixsdvm /mnt/swap
+
+  mkfs.vfat /dev/sda1
+  mkdir -p /mnt/boot/efi
+  mount /dev/sda1 /mnt/boot/efi
+
+  herd start cow-store /mnt
+#+end_src
+
+* Install the system
+
+Edit the [[./etc/config.scm][etc/config.scm]] file as needed (i.e. =efi= and =root= partition names, timezone, keyboard layout).
+
+You need to create the =config.scm= file inside your installation
+- You can add/edit the file on your Guix installation locally or via SSH (with =nano=, =mg= or =vi=)
+- Alternatively, you could also download the raw file from GitHub via =wget=
+
+#+begin_src sh
+  mkdir -p /mnt/etc
+  cp config.scm /mnt/etc/config.scm
+  guix system init /mnt/etc/config.scm /mnt
+#+end_src
+
+* Setup the new system
+
+** Update passwords
+
+The passwords for the =root= and =user= users are initially not set.
+
+#+begin_src sh
+  passwd
+  passwd user
+#+end_src
+
+** Update the system
+
+Login as administrator (=root=) and pull the latest updates.
+
+#+begin_src sh
+  guix pull
+  guix system reconfigure /etc/config.scm
+  reboot
+#+end_src
+
+** Fix the clock
+
+Login as administrator (=root=) and run the commands below.
+
+#+begin_src sh
+  guix package -i ntp
+  ntpdate -s time.nist.gov
+  hwclock --systohc
+  guix package -r ntp
+#+end_src
+
+** User environment setup
+
+This will setup a minimal [[https://arewewaylandyet.com/][Wayland]] graphical environment with a [[https://github.com/yveszoundi/dwl-customization][custom DWL build]] (via [[https://guix.gnu.org/manual/devel/en/html_node/Home-Configuration.html][Guix home configuration management]]).
+- It is assumed have you've pulled the contents of this =git= repository on your new Guix installation
+- We'll then be able to quickly have a system up and running
+ 
+Login as a regular user (=user= in my case), and deploy [[./home/user/src/guix-config/home-configuration.scm][home/user/src/guix-config/home-configuration.scm]].
+
+#+begin_src sh
+  cp -r guix-config/home/user/src ~/
+  guix pull
+  guix home reconfigure ~/src/guix-config/home-configuration.scm
+  exit
+#+end_src
+
+The =dwl= compositor can be started by typing =start-dwl= from a "console" (=tty=).
+
+My preference is to maybe leverage [[https://github.com/engstrand-config/home-service-dwl-guile][home-service-dwl-guile]] going forward:
+- I cannot use it until it gets [[https://github.com/engstrand-config/dwl-guile/issues/33][support for keychords]] (I could bypass most of its keybinding management "quickly" via "hacks" for now...)
+- It conveniently starts a window manager upon first login (user-level service)
+- It is possible to configure declaratively lots of things (keybindings, patches to apply, etc.)
+- However, on my other machines I have a more flexible setup with [[https://sr.ht/~kennylevinsen/greetd/][greetd]] ([[https://github.com/kennylevinsen/gtkgreet][gtkgreet]] as frontend)
+  - I run =gtkgreet= inside [[https://github.com/cage-kiosk/cage][cage]] via a wrapper script (wayland environment variables, etc.)
+  - My =greetd= configuration then invokes a script called =startw= script, and that will launch whatever your want for a given user (=~/.xinitrc= style)
+
+* Additional notes
+
+I have only spent a day or so with =Gnu Guix= so far (scan quickly Youtube videos, assess how to get by without reading much...).
+- I played briefly [[https://nixos.org/][NixOS]] a while back and that helps conceptually
+- I am vaguely familiar with few [[https://wikiless.org/wiki/List_of_Lisp-family_programming_languages?lang=en][LISP dialects]] and that makes it OK for system configuration in =scheme= ([[https://www.gnu.org/software/guile/][GNU Guile]])
+  - [[https://www.gnu.org/software/emacs/][GNU Emacs]] is my main text editor, even though is mostly muscle memory at this point
+    - I used to do almost literraly everything inside emacs (chat, mail and news, calendar, passwords management, app support automation, etc.)
+    - I still write a bit of Emacs Lisp for custom extensions, but I have very little interest in Emacs Lisp or even Emacs itself nowadays
+  - I have experimented with [[https://clojure.org/][Clojure]] in the past (late 2014), and briefly with [[https://common-lisp.net/][Common Lisp]] (because of [[https://stumpwm.github.io/][stumpwm]])
+
+My =home-configuration.scm= file is not exactly what I want (~2-3 hours effort)
+- I started with =home-service-dwl-guile= to get a feel of what could be done
+- I just grabbed all the =dwl= dependencies that I care about and later uninstalled =home-service-dwl-guile=
+
+* References
+
+- https://git.sr.ht/~raghavgururajan/guix-config
+- https://git.sr.ht/~boeg/home/tree/master/.config/guix/system/config.scm
+- https://github.com/engstrand-config/dwl-guile
+- https://guix.gnu.org/manual/en/html_node/Declaring-the-Home-Environment.html
+- https://guix.gnu.org/manual/en/html_node/Essential-Home-Services.html
+- https://github.com/yenda/guix-config/blob/master/readme.org
+- https://packages.guix.gnu.org/
