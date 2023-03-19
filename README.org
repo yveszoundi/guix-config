@@ -190,10 +190,13 @@ My =home-configuration.scm= file is not exactly what I want (~2-3 hours effort)
 
 * References
 
+- https://guix.gnu.org/  
+- https://packages.guix.gnu.org/
 - https://git.sr.ht/~raghavgururajan/guix-config
 - https://git.sr.ht/~boeg/home/tree/master/.config/guix/system/config.scm
 - https://github.com/engstrand-config/dwl-guile
 - https://guix.gnu.org/manual/en/html_node/Declaring-the-Home-Environment.html
 - https://guix.gnu.org/manual/en/html_node/Essential-Home-Services.html
 - https://github.com/yenda/guix-config/blob/master/readme.org
-- https://packages.guix.gnu.org/
+
+
