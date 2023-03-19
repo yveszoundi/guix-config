@@ -33,7 +33,7 @@ For new installations with =QEMU=, I typically [[https://serverfault.com/questio
 ** Create partitions
 Identify your disk partitions (=fdisk -l= can help).
 
-Create 2 partitions by running (=cgdisk /dev/sda= in my case)
+Create 2 partitions by running =cgdisk /dev/sda= (in my case)
 - Setup the EFI partition (code =ef00=) of 300 MB (=/dev/sda1= in my case)
 - Setup the Linux partition (default code) with the remaining disk space (=/dev/sda2= in my case)
 
