@@ -107,6 +107,12 @@ You need to create the =config.scm= file inside your installation
   guix system init /mnt/etc/config.scm /mnt
 #+end_src
 
+You can now reboot into your new system (shutdown/start or reboot depending on your setup).
+
+#+begin_src sh
+  reboot
+#+end_src
+
 * Setup the new system
 
 ** Update passwords
