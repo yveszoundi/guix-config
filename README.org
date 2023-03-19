@@ -30,6 +30,8 @@ You can "ssh into" the Gnu Guix System installation: =ssh root@ip_here -p port_h
 
 For new installations with =QEMU=, I typically [[https://serverfault.com/questions/704294/qemu-multiple-port-forwarding][forward port]] 22 to a fixed port number.
 
+For my personal setup, I'm using =ssh root@localhost -p 62000=.
+
 ** Create partitions
 Identify your disk partitions (=fdisk -l= can help).
 
@@ -118,6 +120,8 @@ You can now reboot into your new system (shutdown/start or reboot depending on y
 ** Update passwords
 
 The passwords for the =root= and =user= users are initially not set.
+
+Let's login as =root= and change that.
 
 #+begin_src sh
   passwd
