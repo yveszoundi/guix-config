@@ -8,7 +8,7 @@
  (guix modules))
 (use-service-modules networking ssh authentication desktop dbus)
 (use-package-modules certs tls
-                     text-editors screen
+                     text-editors screen emacs
                      linux cryptsetup gnupg disk
                      polkit glib
                      shells curl version-control)
