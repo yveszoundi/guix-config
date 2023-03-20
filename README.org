@@ -17,7 +17,7 @@ My initial goal is to contribute to Open Source projects from a Guix environment
   
 * Enable remote installation
 
-After booting the [[https://guix.gnu.org/en/download/][Gnu Guix System ISO image]], please start SSH and setup a non-empty root password for remote access.
+After booting the [[https://guix.gnu.org/en/download/][Gnu Guix System ISO image]], please start SSH and setup a non-blank root password.
 
 #+begin_src sh
   herd start ssh-daemon
@@ -177,7 +177,7 @@ The =dwl= compositor can be started by typing =start-dwl= from a "console" (=tty
 ** Window manager configuration
 
 My preference is to maybe leverage [[https://github.com/engstrand-config/home-service-dwl-guile][home-service-dwl-guile]] going forward:
-- I cannot use it until it gets [[https://github.com/engstrand-config/dwl-guile/issues/33][support for keychords]] (I could bypass most of its keybinding management "quickly" via "hacks" for now...)
+- I cannot use it until it gets [[https://github.com/engstrand-config/dwl-guile/issues/33][support for keychords]]
 - It conveniently starts a window manager upon first login (user-level service)
 - It is possible to configure declaratively lots of things (keybindings, patches to apply, etc.)
 - However, on my other machines I have a more flexible setup with [[https://sr.ht/~kennylevinsen/greetd/][greetd]] ([[https://github.com/kennylevinsen/gtkgreet][gtkgreet]] as frontend)
@@ -206,5 +206,6 @@ I only conceptually understand how to setup a custom environment (=guix shell=)
 - https://git.sr.ht/~boeg/home/tree/master/.config/guix/system/config.scm
 - https://github.com/engstrand-config/dwl-guile
 - https://github.com/yenda/guix-config/blob/master/readme.org
+- https://www.youtube.com/watch?v=XOYirIzUlW8
 
 
