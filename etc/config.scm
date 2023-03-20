@@ -51,7 +51,7 @@
    %base-services))
  (bootloader
   (bootloader-configuration
-   (bootloader grub-efi-bootloader)
+   (bootloader grub-efi-removable-bootloader)
    (targets '("/boot/efi"))
    (timeout 5)
    (keyboard-layout keyboard-layout)))
