@@ -130,7 +130,9 @@ Let's login as =root= and change that.
 
 ** Update the system
 
-Login as administrator (=root=) and pull the latest updates.
+You can now continue the configuration process remotely (=ssh user@localhost -p 62000= in my case).
+
+Login as administrator (=root=) with the =su= command and pull the latest updates.
 
 #+begin_src sh
   guix pull
@@ -140,10 +142,14 @@ Login as administrator (=root=) and pull the latest updates.
 
 ** Fix the clock
 
-Login as administrator (=root=) and run the commands below.
+Connect to the machine remotely (=ssh user@localhost -p 62000= in my case).
+
+Then, as administrator (=root=), run the commands below.
 
 #+begin_src sh
   guix package -i ntp
+  GUIX_PROFILE="/root/.guix-profile"
+  . "$GUIX_PROFILE/etc/profile"
   ntpdate -s time.nist.gov
   hwclock --systohc
   guix package -r ntp
@@ -155,7 +161,7 @@ This will setup a minimal [[https://arewewaylandyet.com/][Wayland]] graphical en
 - It is assumed have you've pulled the contents of this =git= repository on your new Guix installation
 - We'll then be able to quickly have a system up and running
  
-Login as a regular user (=user= in my case), and deploy [[./home/user/src/guix-config/home-configuration.scm][home/user/src/guix-config/home-configuration.scm]].
+*As a regular user* (=user= in my case), deploy [[./home/user/src/guix-config/home-configuration.scm][home/user/src/guix-config/home-configuration.scm]].
 
 #+begin_src sh
   cp -r guix-config/home/user/src ~/
@@ -166,6 +172,10 @@ Login as a regular user (=user= in my case), and deploy [[./home/user/src/guix-c
 
 The =dwl= compositor can be started by typing =start-dwl= from a "console" (=tty=).
 
+* Additional notes
+
+** Window manager configuration
+
 My preference is to maybe leverage [[https://github.com/engstrand-config/home-service-dwl-guile][home-service-dwl-guile]] going forward:
 - I cannot use it until it gets [[https://github.com/engstrand-config/dwl-guile/issues/33][support for keychords]] (I could bypass most of its keybinding management "quickly" via "hacks" for now...)
 - It conveniently starts a window manager upon first login (user-level service)
@@ -173,30 +183,28 @@ My preference is to maybe leverage [[https://github.com/engstrand-config/home-se
 - However, on my other machines I have a more flexible setup with [[https://sr.ht/~kennylevinsen/greetd/][greetd]] ([[https://github.com/kennylevinsen/gtkgreet][gtkgreet]] as frontend)
   - I run =gtkgreet= inside [[https://github.com/cage-kiosk/cage][cage]] via a wrapper script (wayland environment variables, etc.)
   - My =greetd= configuration then invokes a script called =startw= script, and that will launch whatever your want for a given user (=~/.xinitrc= style)
-
-* Additional notes
-
-I have only spent a day or so with =Gnu Guix= so far (scan quickly Youtube videos, assess how to get by without reading much...).
-- I played briefly [[https://nixos.org/][NixOS]] a while back and that helps conceptually
-- I am vaguely familiar with few [[https://wikiless.org/wiki/List_of_Lisp-family_programming_languages?lang=en][LISP dialects]] and that makes it OK for system configuration in =scheme= ([[https://www.gnu.org/software/guile/][GNU Guile]])
-  - [[https://www.gnu.org/software/emacs/][GNU Emacs]] is my main text editor, even though is mostly muscle memory at this point
-    - I used to do almost literraly everything inside emacs (chat, mail and news, calendar, passwords management, app support automation, etc.)
-    - I still write a bit of Emacs Lisp for custom extensions, but I have very little interest in Emacs Lisp or even Emacs itself nowadays
-  - I have experimented with [[https://clojure.org/][Clojure]] in the past (late 2014), and briefly with [[https://common-lisp.net/][Common Lisp]] (because of [[https://stumpwm.github.io/][stumpwm]])
+    
+** Home configuration refactoring
 
 My =home-configuration.scm= file is not exactly what I want (~2-3 hours effort)
 - I started with =home-service-dwl-guile= to get a feel of what could be done
 - I just grabbed all the =dwl= dependencies that I care about and later uninstalled =home-service-dwl-guile=
+  
+** Dev environment setup
+
+I only conceptually understand how to setup a custom environment (=guix shell=)
+- How easy is it to setup one-off environments for non-trivial projects (rust, java, nodejs, c/c++, etc.)?
+- How should I manage GC and snapshots in the future?
 
 * References
 
 - https://guix.gnu.org/  
 - https://packages.guix.gnu.org/
+- https://guix.gnu.org/manual/en/html_node/Declaring-the-Home-Environment.html
+- https://guix.gnu.org/manual/en/html_node/Essential-Home-Services.html
 - https://git.sr.ht/~raghavgururajan/guix-config
 - https://git.sr.ht/~boeg/home/tree/master/.config/guix/system/config.scm
 - https://github.com/engstrand-config/dwl-guile
-- https://guix.gnu.org/manual/en/html_node/Declaring-the-Home-Environment.html
-- https://guix.gnu.org/manual/en/html_node/Essential-Home-Services.html
 - https://github.com/yenda/guix-config/blob/master/readme.org
 
 
