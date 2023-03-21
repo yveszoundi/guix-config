@@ -195,6 +195,10 @@ My =home-configuration.scm= file is not exactly what I want (~2-3 hours effort)
 I only conceptually understand how to setup a custom environment (=guix shell=)
 - How easy is it to setup one-off environments for non-trivial projects (rust, java, nodejs, c/c++, etc.)?
 - How should I manage GC and snapshots in the future?
+  
+** Qemu parameters
+
+If the UI doesn't start, the QEMU parameter =-vga qxl= seems to avoid issues with Wayland drivers/renderers.
 
 * References
 
