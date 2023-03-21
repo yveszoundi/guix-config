@@ -16,6 +16,32 @@
 (define %device-partition-efi  "/dev/sda1")
 (define %device-partition-root "/dev/sda2")
 
+(define (btrfs-mapped-fs mapped-devices devpath mnts subvols)
+  (define (-btrfs-mapped-fs -acc -mapped-devices -devpath -mnts -subvols)
+    (if (= 0 (length -mnts))
+        -acc
+        (let ((-mnt    (car -mnts))
+              (-subvol (car -subvols)))
+          (-btrfs-mapped-fs
+           (cons
+            (file-system
+             (device -devpath)
+             (mount-point -mnt)
+             (type "btrfs")
+             (options (string-append "subvol=" -subvol))
+             (dependencies -mapped-devices))
+            -acc)
+           -mapped-devices
+           -devpath
+           (cdr -mnts)
+           (cdr -subvols)))))
+  (-btrfs-mapped-fs
+   '()
+   mapped-devices
+   devpath
+   (reverse mnts)
+   (reverse subvols)))
+
 (operating-system
  (locale "en_US.utf8")
  (timezone "America/Toronto")
@@ -65,58 +91,23 @@
          (target "guixsdvm")
          (type luks-device-mapping))))
  (file-systems
-  (cons*
-   (file-system
-    (device "/dev/mapper/guixsdvm")
-    (mount-point "/")
-    (type "btrfs")
-    (options "subvol=root")
-    (dependencies mapped-devices))
-   (file-system
-    (device "/dev/mapper/guixsdvm")
-    (mount-point "/swap")
-    (type "btrfs")
-    (options "subvol=swap")
-    (dependencies mapped-devices))
-   (file-system
-    (device "/dev/mapper/guixsdvm")
-    (mount-point "/boot")
-    (type "btrfs")
-    (options "subvol=boot")
-    (dependencies mapped-devices))
-   (file-system
-    (device "/dev/mapper/guixsdvm")
-    (mount-point "/gnu")
-    (type "btrfs")
-    (options "subvol=gnu")
-    (dependencies mapped-devices))
-   (file-system
-    (device "/dev/mapper/guixsdvm")
-    (mount-point "/home")
-    (type "btrfs")
-    (options "subvol=home")
-    (dependencies mapped-devices))
-   (file-system
-    (device "/dev/mapper/guixsdvm")
-    (mount-point "/var/log")
-    (type "btrfs")
-    (options "subvol=log")
-    (dependencies mapped-devices))
-   (file-system
-    (device "/dev/mapper/guixsdvm")
-    (mount-point "/data")
-    (type "btrfs")
-    (options "subvol=data")
-    (dependencies mapped-devices))
-   (file-system
-    (mount-point "/boot/efi")
-    (device
-     (uuid (let* ((port (open-input-pipe (format #f "blkid -s UUID -o value ~a" %device-partition-efi)))
-                  (str (read-line port)))
-             (close-pipe port)
-             str)
-           'fat32))
-    (type "vfat"))
+  (append
+   (btrfs-mapped-fs
+    mapped-devices
+    "/dev/mapper/guixsdvm"
+    '("/"    "/swap" "/boot" "/gnu" "/home" "/var/log" "/data")
+    '("root" "swap"  "boot"  "gnu"  "home"  "log"      "data"))
+   (cons
+    (file-system
+     (mount-point "/boot/efi")
+     (device
+      (uuid (let* ((port (open-input-pipe (format #f "blkid -s UUID -o value ~a" %device-partition-efi)))
+                   (str (read-line port)))
+              (close-pipe port)
+              str)
+            'fat32))
+     (type "vfat"))
+    '())
    %base-file-systems))
  (swap-devices
   (list
