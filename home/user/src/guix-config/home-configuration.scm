@@ -7,7 +7,12 @@
 (use-modules (gnu home)
              (gnu packages)
              (gnu packages gl)
+             (gnu packages tls)
+             (gnu packages pkg-config)
+             (gnu packages crates-io)
+             (gnu packages crates-graphics)
              (gnu packages wm)
+             (gnu packages suckless)
              (gnu packages xorg)
              (gnu packages guile)
              (gnu packages admin)
@@ -21,11 +26,51 @@
              (gnu services)
              (gnu home services)
              (guix gexp)
+             (guix build-system cargo)
              (guix utils)
+             (guix licenses)
              (guix packages)
              (guix download)
              (guix git-download)
              (gnu home services shells))
+
+(define rclip-client-cli
+  (let ((commit "90c7e9257a61bd346fd6d89db9e8f30dd1eff2e7"))
+  (package
+   (name "rclip-client-cli")
+   (version (string-append "1.0.3" "-" (string-take commit 8)))
+   (source (origin
+            (method git-fetch)
+            (uri (git-reference
+                  (url "https://github.com/yveszoundi/guix-rclip-client-cli-wayland")
+                  (commit commit)))
+           (file-name (git-file-name name version))
+           (sha256
+            (base32
+             "0xq7r0kggs97mbdwpvldvrqd5vgqck918jfyvzbvr0srjw9v1cir"))))
+   (build-system cargo-build-system)
+   (arguments
+    `(#:cargo-inputs
+      (("rust-clap"            ,rust-clap-3)
+       ("rust-nix"             ,rust-nix-0.26)
+       ("rust-rustls"          ,rust-rustls-0.20)
+       ("rust-wayland-sys"     ,rust-wayland-sys-0.28)
+       ("rust-wayland-scanner" ,rust-wayland-scanner-0.28)
+       ("rust-dirs"            ,rust-dirs-4)
+       ("rust-xml-rs"          ,rust-xml-rs-0.8)
+       ("rust-wl-clipboard-rs" ,rust-wl-clipboard-rs-0.4)
+       ("rust-serde"           ,rust-serde-1)
+       ("rust-serde-derive"    ,rust-serde-derive-1)
+       ("rust-toml"            ,rust-toml-0.5))))
+   (native-inputs
+    `(("pkg-config" ,pkg-config)))   
+   (home-page
+    "https://github.com/yveszoundi/rclip")
+   (synopsis
+    "Share clipboard text over a network.")
+   (description
+    "Simple clipboard utility for sharing text over a network.")
+   (license gpl3+))))
 
 (define libdrm-2.4.113
   (package
@@ -130,24 +175,24 @@
 (define dwl-custom
   (package
    (inherit dwl)
-   (name "dwl")
+   (name "dwl-custom")
    (version "0.0.1")
    (inputs
     (modify-inputs (package-inputs dwl)
                    (replace "wlroots" wlroots-0.16.0)))
    (arguments
     `(#:tests? #f
-               #:make-flags
-               (list
-                (string-append "CC=" ,(cc-for-target))
-                (string-append "PREFIX=" (assoc-ref %outputs "out")))
-               #:phases
-               (modify-phases %standard-phases
-                              (replace 'configure
-                                       (lambda* (#:key inputs outputs #:allow-other-keys)
-                                                (substitute* "config.def.h"
-                                                             (("vip") (string-append "user")))
-                                                #t)))))
+      #:make-flags
+      (list
+       (string-append "CC=" ,(cc-for-target))
+       (string-append "PREFIX=" (assoc-ref %outputs "out")))
+      #:phases
+      (modify-phases %standard-phases
+                     (replace 'configure
+                              (lambda* (#:key inputs outputs #:allow-other-keys)
+                                       (substitute* "config.def.h"
+                                                    (("vip") (string-append "user")))
+                                       #t)))))
    (source
     (origin
      (inherit (package-source dwl))
@@ -162,7 +207,7 @@
 (define dwlb-custom
   (package
    (inherit dwl)
-   (name "dwlb")
+   (name "dwlb-custom")
    (version "0.0.1")
    (inputs
     (append
@@ -187,7 +232,7 @@
  (packages (append
             (map specification->package+output
                  '("bemenu" "foot" "neofetch" "wlr-randr" "icecat"))
-            (list dwl-custom dwlb-custom)))
+            (list dwl-custom dwlb-custom rclip-client-cli)))
 
  ;; Below is the list of Home services.  To search for available
  ;; services, run 'guix home search KEYWORD' in a terminal.
@@ -209,24 +254,27 @@
                         home-environment-variables-service-type
                         `(("TERM"                        . "xterm-256color")
                           ("COLORTERM"                   . "xterm-256color")
-                          ("XDG_CURRENT_DESKTOP"         . "dwl")
-                          ("XDG_SESSION_TYPE"            . "wayland")
-                          ("WLR_NO_HARDWARE_CURSORS"     . "1")
-                          ("WLR_RENDERER_ALLOW_SOFTWARE" . "0")
-                          ("ELM_ENGINE"                  . "wayland_egl")
-                          ("MOZ_ENABLE_WAYLAND"          . "1")
                           ("_JAVA_AWT_WM_NONREPARENTING" . "1")
-                          ("GDK_BACKEND"                 . "wayland")
                           ("SCREENRC"                    . "$HOME/.config/screen/screenrc")))
         (simple-service 'dot-configs-service
                         home-files-service-type
                         `((".config/foot/foot.ini" ,(local-file "dotfiles/foot/foot.ini"))
                           (".local/bin/start-dwl"
                            ,(local-file "dotfiles/dwl/start-dwl.sh" #:recursive? #t))
-                          (".local/bin/xwrap"
-                           ,(local-file "dotfiles/x11/xwrap.sh" #:recursive? #t))
                           (".local/share/dwl/autostart.sh"
                            ,(local-file "dotfiles/dwl/autostart.sh" #:recursive? #t))
+                          (".local/bin/xwrap"
+                           ,(local-file "dotfiles/x11/xwrap.sh" #:recursive? #t))
+                          (".local/share/rclip/der-cert-pub.der"
+                           ,(local-file "dotfiles/rclip/der-cert-pub.der"))
+                          (".config/rclip/config-client.toml"
+                           ,(local-file "dotfiles/rclip/config-client.toml"))
+                          (".local/bin/rclip-copy"
+                           ,(local-file "dotfiles/rclip/rclip-copy.sh" #:recursive? #t))
+                          (".local/bin/rclip-paste"
+                           ,(local-file "dotfiles/rclip/rclip-paste.sh" #:recursive? #t))
+                          (".local/bin/rclip-clear"
+                           ,(local-file "dotfiles/rclip/rclip-clear.sh" #:recursive? #t))
                           (".config/emacs/init.el"
                            ,(local-file "dotfiles/emacs/init.el"))
                           (".config/screen/screenrc"

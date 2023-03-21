@@ -11,7 +11,7 @@
                      text-editors screen emacs
                      linux cryptsetup gnupg disk
                      polkit glib
-                     shells curl version-control)
+                     shells curl rsync version-control)
 
 (define %device-partition-efi  "/dev/sda1")
 (define %device-partition-root "/dev/sda2")
@@ -39,7 +39,7 @@
     mg emacs
     btrfs-progs cryptsetup gnupg dosfstools
     polkit dbus
-    screen curl git-minimal)
+    screen curl git-minimal rsync)
    %base-packages))
  (services
   (append
