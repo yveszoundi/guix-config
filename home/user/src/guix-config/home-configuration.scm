@@ -36,41 +36,41 @@
 
 (define rclip-client-cli
   (let ((commit "90c7e9257a61bd346fd6d89db9e8f30dd1eff2e7"))
-  (package
-   (name "rclip-client-cli")
-   (version (string-append "1.0.3" "-" (string-take commit 8)))
-   (source (origin
-            (method git-fetch)
-            (uri (git-reference
-                  (url "https://github.com/yveszoundi/guix-rclip-client-cli-wayland")
-                  (commit commit)))
-           (file-name (git-file-name name version))
-           (sha256
-            (base32
-             "0xq7r0kggs97mbdwpvldvrqd5vgqck918jfyvzbvr0srjw9v1cir"))))
-   (build-system cargo-build-system)
-   (arguments
-    `(#:cargo-inputs
-      (("rust-clap"            ,rust-clap-3)
-       ("rust-nix"             ,rust-nix-0.26)
-       ("rust-rustls"          ,rust-rustls-0.20)
-       ("rust-wayland-sys"     ,rust-wayland-sys-0.28)
-       ("rust-wayland-scanner" ,rust-wayland-scanner-0.28)
-       ("rust-dirs"            ,rust-dirs-4)
-       ("rust-xml-rs"          ,rust-xml-rs-0.8)
-       ("rust-wl-clipboard-rs" ,rust-wl-clipboard-rs-0.4)
-       ("rust-serde"           ,rust-serde-1)
-       ("rust-serde-derive"    ,rust-serde-derive-1)
-       ("rust-toml"            ,rust-toml-0.5))))
-   (native-inputs
-    `(("pkg-config" ,pkg-config)))   
-   (home-page
-    "https://github.com/yveszoundi/rclip")
-   (synopsis
-    "Share clipboard text over a network.")
-   (description
-    "Simple clipboard utility for sharing text over a network.")
-   (license gpl3+))))
+    (package
+     (name "rclip-client-cli")
+     (version (string-append "1.0.3" "-" (string-take commit 8)))
+     (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                    (url "https://github.com/yveszoundi/guix-rclip-client-cli-wayland")
+                    (commit commit)))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32
+                "0xq7r0kggs97mbdwpvldvrqd5vgqck918jfyvzbvr0srjw9v1cir"))))
+     (build-system cargo-build-system)
+     (arguments
+      `(#:cargo-inputs
+        (("rust-clap"            ,rust-clap-3)
+         ("rust-nix"             ,rust-nix-0.26)
+         ("rust-rustls"          ,rust-rustls-0.20)
+         ("rust-wayland-sys"     ,rust-wayland-sys-0.28)
+         ("rust-wayland-scanner" ,rust-wayland-scanner-0.28)
+         ("rust-dirs"            ,rust-dirs-4)
+         ("rust-xml-rs"          ,rust-xml-rs-0.8)
+         ("rust-wl-clipboard-rs" ,rust-wl-clipboard-rs-0.4)
+         ("rust-serde"           ,rust-serde-1)
+         ("rust-serde-derive"    ,rust-serde-derive-1)
+         ("rust-toml"            ,rust-toml-0.5))))
+     (native-inputs
+      `(("pkg-config" ,pkg-config)))
+     (home-page
+      "https://github.com/yveszoundi/rclip")
+     (synopsis
+      "Share clipboard text over a network.")
+     (description
+      "Simple clipboard utility for sharing text over a network.")
+     (license gpl3+))))
 
 (define libdrm-2.4.113
   (package
@@ -182,17 +182,17 @@
                    (replace "wlroots" wlroots-0.16.0)))
    (arguments
     `(#:tests? #f
-      #:make-flags
-      (list
-       (string-append "CC=" ,(cc-for-target))
-       (string-append "PREFIX=" (assoc-ref %outputs "out")))
-      #:phases
-      (modify-phases %standard-phases
-                     (replace 'configure
-                              (lambda* (#:key inputs outputs #:allow-other-keys)
-                                       (substitute* "config.def.h"
-                                                    (("vip") (string-append "user")))
-                                       #t)))))
+               #:make-flags
+               (list
+                (string-append "CC=" ,(cc-for-target))
+                (string-append "PREFIX=" (assoc-ref %outputs "out")))
+               #:phases
+               (modify-phases %standard-phases
+                              (replace 'configure
+                                       (lambda* (#:key inputs outputs #:allow-other-keys)
+                                                (substitute* "config.def.h"
+                                                             (("vip") (string-append "user")))
+                                                #t)))))
    (source
     (origin
      (inherit (package-source dwl))
