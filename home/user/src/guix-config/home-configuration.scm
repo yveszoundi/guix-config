@@ -92,11 +92,11 @@
                    (0 (dtao:view ,index))))
          (render `(cond
                    ((dtao:selected-tag? ,index)
-                    ,(string-append "^bg(#ffcc00)^fg(#191919)" str "^fg()^bg()"))
+                    ,(string-append "^bg(#ff9933)^fg(#ffffff)" str "^fg()^bg()"))
                    ((dtao:urgent-tag? ,index)
                     ,(string-append "^bg(#ff0000)^fg(#ffffff)" str "^fg()^bg()"))
                    ((dtao:active-tag? ,index)
-                    ,(string-append "^bg(#666600)^fg(#ffffff)" str "^fg()^bg()"))
+                    ,(string-append "^bg(#FFFF00)^fg(#000000)" str "^fg()^bg()"))
                    (else ,str))))))
     (iota 9 1))
    (list
@@ -166,7 +166,7 @@
                     ;; A font string in fcft format.
                     (font "monospace:style=bold:size=12")
                     ;; Read `root', `border' and `text' colors from dwl-guile.
-                    (background-color "#666600AA")
+                    (background-color "#331614FF")
                     (border-color "333333FF")
                     (foreground-color "FFFFFFFF")
                     (padding-left 8)
@@ -205,8 +205,8 @@
          home-dwl-guile-service-type
          '((setq inhibit-defaults? #t)
            (dwl:set-tty-keys "C-M")
-           (set-layouts 'default "[M]"    'dwl:monocle
-                        'tile    "[]="    'dwl:tile)
+           (set-layouts 'default "[M]" 'dwl:monocle
+                        'tile    "[]=" 'dwl:tile)
            (set-keys "C-t <return>"       '(dwl:spawn "bemenu-run" "-l" "10")
                      "C-t c"              '(dwl:spawn "foot")
                      "C-t [62] S-c"       '(dwl:spawn "rclip-client-cli" "--command" "WRITE")
