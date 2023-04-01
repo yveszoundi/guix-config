@@ -71,13 +71,15 @@
  '(menu-bar-mode nil)
  '(org-agenda-files nil t)
  '(org-fontify-whole-heading-line t)
- '(outline-minor-mode-prefix "h")
+ '(outline-minor-mode-prefix "h")           
  '(package-archives
    '(("gnu" . "https://elpa.gnu.org/packages/")
      ("orgmode" . "https://orgmode.org/elpa/")
      ("melpa" . "https://melpa.org/packages/")))
  '(package-check-signature nil)
  '(package-native-compile t)
+ '(package-selected-packages
+      '(rainbow-mode xclip))
  '(ring-bell-function 'ignore)
  '(sgml-basic-offset 2)
  '(show-paren-mode t)
@@ -121,13 +123,38 @@
  '(xterm-color-names-bright
    ["#505050" "#880000" "#4a5700" "#714900" "#223fbf" "#8f0075" "#185870" "#ffffff"])
  '(xterm-mouse-mode t))
-
+          
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(default ((t (:height 150 :family "Dejavu Sans Mono")))))
+
+(eval-after-load 'package
+  (progn
+    (package-initialize)
+
+    (unless package-archive-contents
+      (package-refresh-contents))
+
+    (dolist (p package-selected-packages)
+      (unless (package-installed-p p)
+        (progn
+          (package-install p))))
+
+    (defun ers/setup-package-sorting ()
+      (setq tabulated-list-format
+            (vconcat
+             (mapcar
+              (lambda (arg)
+                (list
+                 (nth 0 arg)
+                 (nth 1 arg)
+                 (or (nth 2 arg) t)))
+              tabulated-list-format))))
+
+    '(add-hook 'package-menu-mode-hook #'ers/setup-package-sorting)))
 
 ;;;; initialization
 (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
@@ -501,5 +528,9 @@
   (global-set-key (kbd "<mouse-4>") #'scroll-down-line)
   (global-set-key (kbd "<mouse-5>") #'scroll-up-line))
 
-(load-theme 'modus-vivendi t)
+(eval-after-load 'xclip
+    (progn
+          (require 'xclip)
+              '(add-hook 'after-init-hook #'xclip-mode)))
 
+(load-theme 'modus-vivendi t)

@@ -6,23 +6,11 @@
 
 (use-modules (gnu home)
              (gnu packages)
-             (gnu packages gl)
              (gnu packages tls)
              (gnu packages pkg-config)
              (gnu packages crates-io)
-             (gnu packages crates-graphics)
              (gnu packages wm)
-             (gnu packages suckless)
-             (gnu packages xorg)
-             (gnu packages guile)
-             (gnu packages admin)
-             (gnu packages linux)
-             (gnu packages libffi)
-             (gnu packages libbsd)
-             (gnu packages xdisorg)
-             (gnu packages pciutils)
-             (gnu packages build-tools)
-             (gnu packages freedesktop)
+             (gnu packages crates-graphics)
              (gnu services)
              (gnu home services)
              (guix gexp)
@@ -32,10 +20,29 @@
              (guix packages)
              (guix download)
              (guix git-download)
-             (gnu home services shells))
+             (gnu home services shells)
+             (dwl-guile home-service)
+             (dwl-guile patches)
+             (dtao-guile home-service))
+
+(define dwl-guile-latest
+  (let ((commit "fde4e92aaedef44f6a11160a41a70201da1151ee"))
+    (package
+     (inherit dwl-guile)
+     (name "dwl-guile-latest")
+     (version (string-append "2.0.0" "-" (string-take commit 8)))
+     (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                    (url "https://github.com/engstrand-config/dwl-guile")
+                    (commit commit)))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32
+                "1add9s8s1gshrxbd6ppbjydqp3d6xbj5g0zq008zp8sywv98hnk0")))))))
 
 (define rclip-client-cli
-  (let ((commit "90c7e9257a61bd346fd6d89db9e8f30dd1eff2e7"))
+  (let ((commit "35942b1735a307759bfa6ac9eeb07a740044b96a"))
     (package
      (name "rclip-client-cli")
      (version (string-append "1.0.3" "-" (string-take commit 8)))
@@ -47,7 +54,7 @@
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "0xq7r0kggs97mbdwpvldvrqd5vgqck918jfyvzbvr0srjw9v1cir"))))
+                "0q8ly3f0wxkx4bwall6fj3842mb8p2d008h5flcagc5cs69fzh88"))))
      (build-system cargo-build-system)
      (arguments
       `(#:cargo-inputs
@@ -72,158 +79,31 @@
       "Simple clipboard utility for sharing text over a network.")
      (license gpl3+))))
 
-(define libdrm-2.4.113
-  (package
-   (inherit libdrm)
-   (name "libdrm")
-   (version "2.4.113")
-   (source (origin
-            (method url-fetch)
-            (uri (string-append
-                  "https://dri.freedesktop.org/libdrm/libdrm-"
-                  version ".tar.xz"))
-            (sha256
-             (base32
-              "1qg54drng3mxm64dsxgg0l6li4yrfzi50bgj0r3fnfzncwlypmvz"))))))
-
-(define wayland-1.21.0
-  (package
-   (inherit wayland)
-   (name "wayland")
-   (version "1.21.0")
-   (source (origin
-            (method url-fetch)
-            (uri (string-append "https://gitlab.freedesktop.org/wayland/wayland/-/releases/"
-                                version "/downloads/" name "-" version ".tar.xz"))
-            (sha256
-             (base32
-              "1b0ixya9bfw5c9jx8mzlr7yqnlyvd3jv5z8wln9scdv8q5zlvikd"))))
-   (propagated-inputs
-    (list libffi))))
-
-(define wayland-protocols-1.27
-  (package
-   (inherit wayland-protocols)
-   (name "wayland-protocols")
-   (version "1.27")
-   (source (origin
-            (method url-fetch)
-            (uri (string-append
-                  "https://gitlab.freedesktop.org/wayland/wayland-protocols/-/releases/"
-                  version "/downloads/" name "-" version ".tar.xz"))
-            (sha256
-             (base32
-              "0p1pafbcc8b8p3175b03cnjpbd9zdgxsq0ssjq02lkjx885g2ilh"))))
-   (inputs
-    (modify-inputs (package-inputs wayland-protocols)
-                   (replace "wayland" wayland-1.21.0)))))
-
-(define xorg-server-xwayland-22.1.5
-  (package
-   (inherit xorg-server-xwayland)
-   (name "xorg-server-xwayland")
-   (version "22.1.5")
-   (source
-    (origin
-     (method url-fetch)
-     (uri (string-append "https://xorg.freedesktop.org/archive/individual"
-                         "/xserver/xwayland-" version ".tar.xz"))
-     (sha256
-      (base32
-       "0whnmi2v1wvaw8y7d32sb2avsjhyj0h18xi195jj30wz24gsq5z3"))))
-   (inputs
-    (modify-inputs (package-inputs xorg-server-xwayland)
-                   (prepend libbsd libxcvt)
-                   (replace "wayland" wayland-1.21.0)
-                   (replace "wayland-protocols" wayland-protocols-1.27)))))
-
-(define wlroots-0.16.0
-  (package
-   (inherit wlroots)
-   (name "wlroots")
-   (version "0.16.0")
-   (source
-    (origin
-     (method git-fetch)
-     (uri (git-reference
-           (url "https://gitlab.freedesktop.org/wlroots/wlroots")
-           (commit version)))
-     (file-name (git-file-name name version))
-     (sha256
-      (base32 "18rfr3wfm61dv9w8m4xjz4gzq2v3k5vx35ymbi1cggkgbk3lbc4k"))))
-   (inputs
-    (modify-inputs (package-inputs wlroots)
-                   (prepend `(,hwdata "pnp"))))
-   (propagated-inputs
-    (modify-inputs (package-propagated-inputs wlroots)
-                   (prepend libdrm-2.4.113)
-                   (replace "wayland" wayland-1.21.0)
-                   (replace "wayland-protocols" wayland-protocols-1.27)
-                   (replace "xorg-server-xwayland" xorg-server-xwayland-22.1.5)))
-   (arguments
-    (substitute-keyword-arguments
-     (package-arguments wlroots)
-     ((#:phases phases)
-      #~(modify-phases
-         #$phases
-         (add-after 'unpack 'patch-hwdata-path
-                    (lambda* (#:key inputs #:allow-other-keys)
-                             (substitute* "backend/drm/meson.build"
-                                          (("/usr/share/hwdata/pnp.ids")
-                                           (search-input-file inputs "share/hwdata/pnp.ids")))))))))))
-
-(define dwl-custom
-  (package
-   (inherit dwl)
-   (name "dwl-custom")
-   (version "0.0.1")
-   (inputs
-    (modify-inputs (package-inputs dwl)
-                   (replace "wlroots" wlroots-0.16.0)))
-   (arguments
-    `(#:tests? #f
-               #:make-flags
-               (list
-                (string-append "CC=" ,(cc-for-target))
-                (string-append "PREFIX=" (assoc-ref %outputs "out")))
-               #:phases
-               (modify-phases %standard-phases
-                              (replace 'configure
-                                       (lambda* (#:key inputs outputs #:allow-other-keys)
-                                                (substitute* "config.def.h"
-                                                             (("vip") (string-append "user")))
-                                                #t)))))
-   (source
-    (origin
-     (inherit (package-source dwl))
-     (uri (git-reference
-           (url "https://github.com/yveszoundi/dwl-customization")
-           (commit (string-append "v" version))))
-     (file-name (git-file-name name version))
-     (sha256
-      (base32
-       "1xv4yc9nmrhrdx1d1zsyji6bn08989qarzzxa30a1yf0rddli79a"))))))
-
-(define dwlb-custom
-  (package
-   (inherit dwl)
-   (name "dwlb-custom")
-   (version "0.0.1")
-   (inputs
-    (append
-     (map specification->package+output
-          '("pixman" "fcft" "uthash"))
-     (list wlroots-0.16.0)))
-   (source
-    (origin
-     (inherit (package-source dwl))
-     (uri (git-reference
-           (url "https://github.com/yveszoundi/dwlb-customization")
-           (commit (string-append "v" version))))
-     (file-name (git-file-name name version))
-     (sha256
-      (base32
-       "005v50n81r7wjnb98nzln564aafmx7cmamnzkpvad88f9m4sny8j"))))))
+(define (%tags-and-layout)
+  (append
+   (map
+    (lambda (tag)
+      (let ((str (string-append "^p(8)" (number->string tag) "^p(8)"))
+            (index (- tag 1)))
+        (dtao-block
+         (interval 0)
+         (events? #t)
+         (click `(match button
+                   (0 (dtao:view ,index))))
+         (render `(cond
+                   ((dtao:selected-tag? ,index)
+                    ,(string-append "^bg(#ffcc00)^fg(#191919)" str "^fg()^bg()"))
+                   ((dtao:urgent-tag? ,index)
+                    ,(string-append "^bg(#ff0000)^fg(#ffffff)" str "^fg()^bg()"))
+                   ((dtao:active-tag? ,index)
+                    ,(string-append "^bg(#666600)^fg(#ffffff)" str "^fg()^bg()"))
+                   (else ,str))))))
+    (iota 9 1))
+   (list
+    (dtao-block
+     (events? #t)
+     (click `(dtao:next-layout))
+     (render `(string-append "^p(4)" (dtao:get-layout)))))))
 
 (home-environment
  ;; Below is the list of packages that will show up in your
@@ -231,8 +111,8 @@
  ;; (packages (specifications->packages (list "openssl@3.0.7")))
  (packages (append
             (map specification->package+output
-                 '("bemenu" "foot" "neofetch" "wlr-randr" "icecat"))
-            (list dwl-custom dwlb-custom rclip-client-cli)))
+                 '("bemenu" "foot" "neofetch" "wlr-randr" "wl-clipboard" "icecat" "swaybg"))
+            (list rclip-client-cli)))
 
  ;; Below is the list of Home services.  To search for available
  ;; services, run 'guix home search KEYWORD' in a terminal.
@@ -254,14 +134,13 @@
                         home-environment-variables-service-type
                         `(("TERM"                        . "xterm-256color")
                           ("COLORTERM"                   . "xterm-256color")
-                          ("_JAVA_AWT_WM_NONREPARENTING" . "1")
+                          ("WLR_NO_HARDWARE_CURSORS"     . "1")
+                          ("WLR_RENDERER_ALLOW_SOFTWARE" . "0")
                           ("SCREENRC"                    . "$HOME/.config/screen/screenrc")))
         (simple-service 'dot-configs-service
                         home-files-service-type
                         `((".config/foot/foot.ini" ,(local-file "dotfiles/foot/foot.ini"))
-                          (".local/bin/start-dwl"
-                           ,(local-file "dotfiles/dwl/start-dwl.sh" #:recursive? #t))
-                          (".local/share/dwl/autostart.sh"
+                          (".local/share/dwl-guile/autostart.sh"
                            ,(local-file "dotfiles/dwl/autostart.sh" #:recursive? #t))
                           (".local/bin/xwrap"
                            ,(local-file "dotfiles/x11/xwrap.sh" #:recursive? #t))
@@ -269,13 +148,116 @@
                            ,(local-file "dotfiles/rclip/der-cert-pub.der"))
                           (".config/rclip/config-client.toml"
                            ,(local-file "dotfiles/rclip/config-client.toml"))
-                          (".local/bin/rclip-copy"
-                           ,(local-file "dotfiles/rclip/rclip-copy.sh" #:recursive? #t))
-                          (".local/bin/rclip-paste"
-                           ,(local-file "dotfiles/rclip/rclip-paste.sh" #:recursive? #t))
-                          (".local/bin/rclip-clear"
-                           ,(local-file "dotfiles/rclip/rclip-clear.sh" #:recursive? #t))
                           (".config/emacs/init.el"
                            ,(local-file "dotfiles/emacs/init.el"))
                           (".config/screen/screenrc"
-                           ,(local-file "dotfiles/screen/screenrc")))))))
+                           ,(local-file "dotfiles/screen/screenrc"))))
+        (service home-dwl-guile-service-type
+                 (home-dwl-guile-configuration
+                  (package dwl-guile-latest)
+                  (native-qt? #t)
+                  (auto-start? #t)
+                  (config '())))
+        (service home-dtao-guile-service-type
+                 (home-dtao-guile-configuration
+                  (auto-start? #t)
+                  (config
+                   (dtao-config
+                    ;; A font string in fcft format.
+                    (font "monospace:style=bold:size=12")
+                    ;; Read `root', `border' and `text' colors from dwl-guile.
+                    (background-color "#666600AA")
+                    (border-color "333333FF")
+                    (foreground-color "FFFFFFFF")
+                    (padding-left 8)
+                    (padding-right 8)
+                    (padding-top 2)
+                    (padding-bottom 2)
+                    ;; Request an exclusive zone for the bar to prevent overlapping.
+                    (exclusive? #t)
+                    ;; Layer to render the bar in (LAYER-TOP, LAYER-BOTTOM, LAYER-OVERLAY, LAYER-BACKGROUND).
+                    (layer 'LAYER-BOTTOM)
+                    ;; Render the bar at the bottom of the screen.
+                    (bottom? #f)
+                    ;; Height of the bar in pixels. Set to #f for automatic height based on font size.
+                    (height #f)
+                    ;; Delimiter string of arbitrary length inserted between blocks.
+                    (delimiter #f)
+                    ;; Additional spacing on each side of the delimiter string.
+                    (block-spacing 0)
+                    (left-blocks (%tags-and-layout))
+                    (center-blocks (list
+                                    (dtao-block
+                                     (events? #t) ;; Must be enabled to correctly re-render upon event/state change
+                                     (render `(dtao:title)))))
+                    (right-blocks
+                     (list
+                      (dtao-block
+                       (interval 1)
+                       (render `(strftime "%A, %d %b (w.%V) %T" (localtime (current-time)))))))
+                    ;; List of Guile module dependencies needed to run your blocks.
+                    (modules '((ice-9 match)
+                               (ice-9 popen)
+                               (ice-9 rdelim)
+                               (srfi srfi-1)))))))
+        (simple-service
+         'change-dwl-guile
+         home-dwl-guile-service-type
+         '((setq inhibit-defaults? #t)
+           (dwl:set-tty-keys "C-M")
+           (set-layouts 'default "[M]"    'dwl:monocle
+                        'tile    "[]="    'dwl:tile)
+           (set-keys "C-t <return>"       '(dwl:spawn "bemenu-run" "-l" "10")
+                     "C-t c"              '(dwl:spawn "foot")
+                     "C-t [62] S-c"       '(dwl:spawn "rclip-client-cli" "--command" "WRITE")
+                     "C-t [62] S-v"       '(dwl:spawn "rclip-client-cli" "--command" "READ")
+                     "C-t n"              '(dwl:focus-stack 1)
+                     "C-t p"              '(dwl:focus-stack -1)
+                     "C-t ["              '(dwl:change-masters -1)
+                     "C-t ]"              '(dwl:change-masters 1)
+                     "C-t [50] S-["       '(dwl:change-master-factor -0.05)
+                     "C-t [50] S-]"       '(dwl:change-master-factor 0.05)
+                     "C-t <tab>"          '(dwl:cycle-layout 1)
+                     "C-t <left>"         '(dwl:focus-monitor 'DIRECTION-LEFT)
+                     "C-t <right>"        '(dwl:focus-monitor 'DIRECTION-RIGHT)
+                     "C-t <up>"           '(dwl:focus-monitor 'DIRECTION-UP)
+                     "C-t <down>"         '(dwl:focus-monitor 'DIRECTION-DOWN)
+                     "C-t [50] S-<left>"  '(dwl:tag-monitor 'DIRECTION-LEFT)
+                     "C-t [50] S-<right>" '(dwl:tag-monitor 'DIRECTION-RIGHT)
+                     "C-t [50] S-<up>"    '(dwl:tag-monitor 'DIRECTION-UP)
+                     "C-t [50] S-<down>"  '(dwl:tag-monitor 'DIRECTION-DOWN)
+                     "C-t k"              'dwl:kill-client
+                     "C-t `"              'dwl:zoom
+                     "C-t [62] S-e"       'dwl:toggle-fullscreen
+                     "C-t [62] S-<space>" 'dwl:toggle-floating
+                     "C-t q"              'dwl:quit
+                     "C-t <escape>"       'dwl:quit
+                     "C-<mouse-left>"     'dwl:move
+                     "C-<mouse-middle>"   'dwl:toggle-floating
+                     "C-<mouse-right>"    'dwl:resize
+                     "C-t 1"              '(dwl:view 1)
+                     "C-t 2"              '(dwl:view 2)
+                     "C-t 3"              '(dwl:view 3)
+                     "C-t 4"              '(dwl:view 4)
+                     "C-t 5"              '(dwl:view 5)
+                     "C-t 6"              '(dwl:view 6)
+                     "C-t 7"              '(dwl:view 7)
+                     "C-t 8"              '(dwl:view 8)
+                     "C-t 9"              '(dwl:view 9)
+                     "C-t [62] S-1"       '(dwl:tag 1)
+                     "C-t [62] S-2"       '(dwl:tag 2)
+                     "C-t [62] S-3"       '(dwl:tag 3)
+                     "C-t [62] S-4"       '(dwl:tag 4)
+                     "C-t [62] S-5"       '(dwl:tag 5)
+                     "C-t [62] S-6"       '(dwl:tag 6)
+                     "C-t [62] S-7"       '(dwl:tag 7)
+                     "C-t [62] S-8"       '(dwl:tag 8)
+                     "C-t [62] S-9"       '(dwl:tag 9))
+           (add-hook! dwl:hook-startup
+                      (lambda ()
+                        (dwl:spawn (string-append
+                                    (getenv "XDG_DATA_HOME")
+                                    file-name-separator-string
+                                    "dwl-guile"
+                                    file-name-separator-string
+                                    "autostart.sh")))))))))

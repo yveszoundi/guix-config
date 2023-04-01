@@ -6,5 +6,5 @@ escape ^Jj
 hardstatus alwayslastline
 attrcolor b ".I"
 defbce "on"
-hardstatus alwayslastline "%-Lw%{= BW}%50>%n%f* %t%{-}%+Lw%<  %=% [%{=b)%{Y}%l%{g}]"
-term xterm-256color 
+hardstatus alwayslastline "%{=}%-w%{+b w}%n %t%{-b w}%+w %=%c"
+term xterm-256color

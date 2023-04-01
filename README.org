@@ -132,11 +132,9 @@ Let's login as =root= and change that.
 
 You can now continue the configuration process remotely (=ssh user@localhost -p 62000= in my case).
 
-Login as administrator (=root=) with the =su= command and pull the latest updates.
-
 #+begin_src sh
   guix pull
-  guix system reconfigure /etc/config.scm
+  sudo guix system reconfigure /etc/config.scm
   reboot
 #+end_src
 
@@ -144,14 +142,12 @@ Login as administrator (=root=) with the =su= command and pull the latest update
 
 Connect to the machine remotely (=ssh user@localhost -p 62000= in my case).
 
-Then, as administrator (=root=), run the commands below.
-
 #+begin_src sh
   guix package -i ntp
-  GUIX_PROFILE="/root/.guix-profile"
+  GUIX_PROFILE="$HOME/.guix-profile"
   . "$GUIX_PROFILE/etc/profile"
-  ntpdate -s time.nist.gov
-  hwclock --systohc
+  sudo ntpdate -s time.nist.gov
+  sudo hwclock --systohc
   guix package -r ntp
 #+end_src
 
@@ -164,7 +160,8 @@ This will setup a minimal [[https://arewewaylandyet.com/][Wayland]] graphical en
 *As a regular user* (=user= in my case), deploy [[./home/user/src/guix-config/home-configuration.scm][home/user/src/guix-config/home-configuration.scm]].
 
 #+begin_src sh
-  cp -r guix-config/home/user/src ~/
+  mkdir -p ~/src/guix-config && guix home import ~/src/guix-config
+  cp -rf guix-config/home/user/src/guix-config/* ~/
   guix pull
   guix home reconfigure ~/src/guix-config/home-configuration.scm
   exit
