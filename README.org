@@ -146,8 +146,7 @@ Connect to the machine remotely (=ssh user@localhost -p 62000= in my case).
   guix package -i ntp
   GUIX_PROFILE="$HOME/.guix-profile"
   . "$GUIX_PROFILE/etc/profile"
-  sudo ntpdate -s time.nist.gov
-  sudo hwclock --systohc
+  sudo ntpdate -s time.nist.gov && sudo hwclock --systohc
   guix package -r ntp
 #+end_src
 
@@ -160,40 +159,27 @@ This will setup a minimal [[https://arewewaylandyet.com/][Wayland]] graphical en
 *As a regular user* (=user= in my case), deploy [[./home/user/src/guix-config/home-configuration.scm][home/user/src/guix-config/home-configuration.scm]].
 
 #+begin_src sh
-  mkdir -p ~/src/guix-config && guix home import ~/src/guix-config
-  cp -rf guix-config/home/user/src/guix-config/* ~/
+  mkdir -p ~/Downloads ~/.config/guix
+  cd ~/Downloads
+  git clone https://github.com/yveszoundi/guix-config
+  cp -rf home/user/src ~/
+  cp home/user/.config/guix/channels.scm ~/.config/guix/
   guix pull
   guix home reconfigure ~/src/guix-config/home-configuration.scm
-  exit
+  cd -
 #+end_src
 
-The =dwl= compositor can be started by typing =start-dwl= from a "console" (=tty=).
+Upon first login in the =tty=, the =dwl= window manager will be started.
 
 * Additional notes
-
-** Window manager configuration
-
-My preference is to maybe leverage [[https://github.com/engstrand-config/home-service-dwl-guile][home-service-dwl-guile]] going forward:
-- I cannot use it until it gets [[https://github.com/engstrand-config/dwl-guile/issues/33][support for keychords]]
-- It conveniently starts a window manager upon first login (user-level service)
-- It is possible to configure declaratively lots of things (keybindings, patches to apply, etc.)
-- However, on my other machines I have a more flexible setup with [[https://sr.ht/~kennylevinsen/greetd/][greetd]] ([[https://github.com/kennylevinsen/gtkgreet][gtkgreet]] as frontend)
-  - I run =gtkgreet= inside [[https://github.com/cage-kiosk/cage][cage]] via a wrapper script (wayland environment variables, etc.)
-  - My =greetd= configuration then invokes a script called =startw= script, and that will launch whatever your want for a given user (=~/.xinitrc= style)
-    
-** Home configuration refactoring
-
-My =home-configuration.scm= file is not exactly what I want (~2-3 hours effort)
-- I started with =home-service-dwl-guile= to get a feel of what could be done
-- I just grabbed all the =dwl= dependencies that I care about and later uninstalled =home-service-dwl-guile=
   
 ** Dev environment setup
 
-I only conceptually understand how to setup a custom environment (=guix shell=)
+I only conceptually understand how to setup a custom environment (=guix shell=):
 - How easy is it to setup one-off environments for non-trivial projects (rust, java, nodejs, c/c++, etc.)?
 - How should I manage GC and snapshots in the future?
   
-** Qemu parameters
+** QEMU parameters
 
 If the UI doesn't start, the QEMU parameter =-vga qxl= seems to avoid issues with Wayland drivers/renderers.
 

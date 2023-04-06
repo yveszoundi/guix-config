@@ -3,8 +3,9 @@ shell -$SHELL
 vbell off
 defscrollback 10000
 escape ^Jj
+hardstatus off
 hardstatus alwayslastline
+hardstatus string '%{= .g} %H |%=%{K}%{= w}%?%{K}%-Lw%?%{r}(%{W}%{w}%n%{w}*%f%t%?(%u)%?%{r})%{w}%?%{K}%+Lw%?%= %{g}|%{B} %m-%d  %{W}%c %{g} '
 attrcolor b ".I"
 defbce "on"
-hardstatus alwayslastline "%{=}%-w%{+b w}%n %t%{-b w}%+w %=%c"
 term xterm-256color
