@@ -28,7 +28,6 @@
               %base-user-accounts))
  (packages (append (map specification->package+output
 			'("screen"
-			  "emacs-next-pgtk"
 			  "oksh"
 			  "git-minimal"
 			  "rsync"
