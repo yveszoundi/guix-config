@@ -50,7 +50,7 @@ Encrypt the main partition.
 #+end_src
 
 ** Open LUKS device
-
+21M4;20M
 Open the encrypted device.
 
 #+begin_src sh
@@ -101,7 +101,7 @@ Edit the [[./etc/config.scm][etc/config.scm]] file as needed (i.e. =efi= and =ro
 
 You need to create the =config.scm= file inside your installation
 - You can add/edit the file on your Guix installation locally or via SSH (with =nano=, =mg= or =vi=)
-- Alternatively, you could also download the raw file from GitHub via =wget=
+- Alternatively, you could also download the raw file from GitHub via =wget= or =curl=
 
 #+begin_src sh
   mkdir -p /mnt/etc

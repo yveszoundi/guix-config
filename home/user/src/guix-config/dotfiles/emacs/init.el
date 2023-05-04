@@ -71,15 +71,13 @@
  '(menu-bar-mode nil)
  '(org-agenda-files nil t)
  '(org-fontify-whole-heading-line t)
- '(outline-minor-mode-prefix "h")           
+ '(outline-minor-mode-prefix "h")
  '(package-archives
    '(("gnu" . "https://elpa.gnu.org/packages/")
      ("orgmode" . "https://orgmode.org/elpa/")
      ("melpa" . "https://melpa.org/packages/")))
  '(package-check-signature nil)
  '(package-native-compile t)
- '(package-selected-packages
-      '(rainbow-mode xclip))
  '(ring-bell-function 'ignore)
  '(sgml-basic-offset 2)
  '(show-paren-mode t)
@@ -123,7 +121,7 @@
  '(xterm-color-names-bright
    ["#505050" "#880000" "#4a5700" "#714900" "#223fbf" "#8f0075" "#185870" "#ffffff"])
  '(xterm-mouse-mode t))
-          
+
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -131,6 +129,7 @@
  ;; If there is more than one, they won't work right.
  '(default ((t (:height 150 :family "Dejavu Sans Mono")))))
 
+;;;; system-packages
 (eval-after-load 'package
   (progn
     (package-initialize)
@@ -156,9 +155,13 @@
 
     '(add-hook 'package-menu-mode-hook #'ers/setup-package-sorting)))
 
+;;;; guix-emacs-packages
+(load-file (expand-file-name "~/.guix-home/profile/share/emacs/site-lisp/subdirs.el"))
+(guix-emacs-autoload-packages)
+
 ;;;; initialization
 (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
-
+(setq-default ns-use-srgb-colorspace nil)
 (setq warning-minimum-level              :error
       confirm-nonexistent-file-or-buffer nil
       ffap-machine-p-known               'reject)
@@ -244,7 +247,7 @@
     (setq eshell-highlight-prompt       nil
           eshell-history-size           8000
           eshell-path-env               (getenv "PATH")
-          eshell-cmpl-cycle-completions nil)    
+          eshell-cmpl-cycle-completions nil)
 
     (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
     (add-hook 'eshell-preoutput-filter-functions 'ansi-color-filter-apply)
@@ -407,7 +410,7 @@
       (interactive)
       (require 'dired-x)
       (require 'ls-lisp)
-      (dired-hide-details-mode 1)      
+      (dired-hide-details-mode 1)
       (define-key dired-mode-map "." #'dired-up-directory))
 
     '(add-hook 'dired-mode-hook 'ers/dired-setup)))
@@ -507,6 +510,7 @@
 (global-set-key (kbd "C-x C-m") #'execute-extended-command)
 (global-set-key (kbd "M-s l")   #'goto-line)
 (global-set-key (kbd "M-s e")   #'eshell)
+(global-set-key (kbd "M-s j")   #'avy-goto-char)
 (global-set-key (kbd "M-s s")   #'grep-find)
 (global-set-key (kbd "M-s o")   #'occur)
 (global-set-key (kbd "C-x o")   #'other-window)
@@ -529,8 +533,8 @@
   (global-set-key (kbd "<mouse-5>") #'scroll-up-line))
 
 (eval-after-load 'xclip
-    (progn
-          (require 'xclip)
-              '(add-hook 'after-init-hook #'xclip-mode)))
+  (progn
+    (require 'xclip)
+    '(add-hook 'after-init-hook #'xclip-mode)))
 
-(load-theme 'modus-vivendi t)
+(load-theme 'rimero t)

@@ -1,5 +1,0 @@
-# Honor per-interactive-shell startup file
-if [ -f ~/.bashrc ]; then . ~/.bashrc; fi
-
-PATH="$HOME/.local/bin:$PATH"
-export PATH

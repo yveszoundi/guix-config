@@ -1,3 +1,6 @@
+PATH="$HOME/.local/bin:$PATH"
+export PATH
+
 # Bash initialization for interactive non-login shells and
 # for remote shells (info "(bash) Bash Startup Files").
 
@@ -16,9 +19,6 @@ then
     return
 fi
 
-# Source the system-wide file.
-source /etc/bashrc
-
 # Adjust the prompt depending on whether we're in 'guix environment'.
 if [ -n "$GUIX_ENVIRONMENT" ]
 then
@@ -26,6 +26,15 @@ then
 else
     PS1='\u@\h \w\$ '
 fi
+
 alias ls='ls -p --color=auto'
 alias ll='ls -l'
 alias grep='grep --color=auto'
+
+window_restore() {
+	wlr-randr --output Virtual-1 --mode 1440x900
+}
+
+window_maximize() {
+	wlr-randr --output Virtual-1 --mode 1920x1080
+}

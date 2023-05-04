@@ -6,27 +6,34 @@
 
 (use-modules (gnu home)
              (gnu packages)
+             (gnu packages gcc)
+             (gnu packages datastructures)
              (gnu packages tls)
              (gnu packages pkg-config)
              (gnu packages crates-io)
              (gnu packages wm)
              (gnu packages crates-graphics)
+             (gnu packages freedesktop)
+             (gnu packages xdisorg)
+             (gnu packages image)
              (gnu services)
              (gnu home services)
+             (gnu home services shells)
              (guix gexp)
-             (guix build-system cargo)
              (guix utils)
-             (guix licenses)
+             ((guix licenses) #:prefix license:)
              (guix packages)
              (guix download)
              (guix git-download)
-             (gnu home services shells)
+             (guix build-system cargo)
+             (guix build-system meson)
+             (guix build-system emacs)
              (dwl-guile home-service)
              (dwl-guile patches)
              (dtao-guile home-service))
 
 (define dwl-guile-latest
-  (let ((commit "fde4e92aaedef44f6a11160a41a70201da1151ee"))
+  (let ((commit "616193f53a4e0c85b278c283a706658ed47d0db3"))
     (package
      (inherit dwl-guile)
      (name "dwl-guile-latest")
@@ -39,7 +46,55 @@
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "1add9s8s1gshrxbd6ppbjydqp3d6xbj5g0zq008zp8sywv98hnk0")))))))
+                "1mypdhn4rrg93gal3x6047jxm5gwpk8cs1f0x193ciwr4n1iwmmd")))))))
+
+(define emacs-rimero-theme
+  (let ((commit "a2e706c2b34f749019979a133f08a2d94a1104b3"))
+    (package
+     (name "emacs-rimero-theme")
+     (version (string-append "0.0.5" "-" (string-take commit 8)))
+     (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                    (url "https://github.com/yveszoundi/emacs-rimero-theme")
+                    (commit commit)))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32
+                "1kcvvaizggzi7s3dlh611bkirdf6y89kzddc273drdks705s01wh"))))
+     (build-system emacs-build-system)
+     (home-page "https://github.com/yveszoundi/emacs-rimero-theme")
+     (synopsis "A dark emacs theme that is easy on the eyes.")
+     (description
+      "Theme with a dark background suitable for UI and terminal usage.")
+     (license license:gpl3+))))
+
+(define-public wbg
+  (package
+   (name "wbg")
+   (version "1.0.2")
+   (source
+    (origin
+     (method git-fetch)
+     (uri (git-reference
+           (url "https://codeberg.org/dnkl/wbg")
+           (commit version)))
+     (file-name (git-file-name name version))
+     (sha256
+      (base32
+       "182cyp97lxwxl5r6f25irvm62ii0j1knmpwlpwa1w00j2xchx89w"))))
+   (build-system meson-build-system)
+   (arguments
+    `(#:build-type "release"))
+   (native-inputs
+    (list pkg-config wayland-protocols gcc-10 tllist))
+   (inputs
+    (list wlroots wayland pixman libpng libjpeg-turbo))
+   (license license:expat)
+   (home-page "https://codeberg.org/dnkl/wbg")
+   (synopsis "Super simple wallpaper application for Wayland compositors")
+   (description "Super simple wallpaper application for
+                              Wayland compositors implementing the layer-shell protocol.")))
 
 (define rclip-client-cli
   (let ((commit "35942b1735a307759bfa6ac9eeb07a740044b96a"))
@@ -77,7 +132,7 @@
       "Share clipboard text over a network.")
      (description
       "Simple clipboard utility for sharing text over a network.")
-     (license gpl3+))))
+     (license license:gpl3+))))
 
 (define (%tags-and-layout)
   (append
@@ -111,153 +166,154 @@
  ;; (packages (specifications->packages (list "openssl@3.0.7")))
  (packages (append
             (map specification->package+output
-                 '("bemenu" "foot" "neofetch" "wlr-randr" "wl-clipboard" "icecat" "swaybg"))
-            (list rclip-client-cli)))
+                 '("bemenu" "foot" "neofetch" "wlr-randr" "wl-clipboard"
+                   "pcmanfm" "arc-icon-theme" "adwaita-icon-theme" "lxqt-qtplugin"
+                   "pinentry-emacs" "jq" "qtwayland" "egl-wayland" "xwininfo"
+                   "swaybg" "imv" "zathura" "zathura-pdf-mupdf" "icecat"
+                   "emacs-pinentry" "emacs-systemd-mode" "emacs-feature-mode"
+                   "emacs-dockerfile-mode""emacs-avy" "emacs-rust-mode" "emacs-move-text"
+                   "emacs-xclip" "emacs-markdown-mode" "emacs-jinja2-mode" "emacs-dockerfile-mode"
+                   "emacs-rainbow-mode" "emacs-markdown-mode" "emacs-yaml-mode"
+                   "emacs-pinentry" "emacs-systemd-mode" "emacs-feature-mode"))
+            (list emacs-rimero-theme wbg rclip-client-cli)))
 
  ;; Below is the list of Home services.  To search for available
  ;; services, run 'guix home search KEYWORD' in a terminal.
  (services
-  (list (service home-bash-service-type
-                 (home-bash-configuration
-                  (aliases '(("grep" . "grep --color=auto")
-                             ("ll"   . "ls -l")
-                             ("mg"   . "mg -n")
-                             ("em"   . "emacs -nw")
-                             ("ls"   . "ls -p --color=auto")))
-                  (bashrc (list (local-file
-                                 "dotfiles/bash/bashrc"
-                                 "bashrc")))
-                  (bash-profile (list (local-file
-                                       "dotfiles/bash/bash_profile"
-                                       "bash_profile")))))
-        (simple-service 'some-useful-env-vars-service
-                        home-environment-variables-service-type
-                        `(("TERM"                        . "xterm-256color")
-                          ("COLORTERM"                   . "xterm-256color")
-                          ("WLR_NO_HARDWARE_CURSORS"     . "1")
-                          ("WLR_RENDERER_ALLOW_SOFTWARE" . "0")
-                          ("SCREENRC"                    . "$HOME/.config/screen/screenrc")))
-        (simple-service 'dot-configs-service
-                        home-files-service-type
-                        `((".config/foot/foot.ini" ,(local-file "dotfiles/foot/foot.ini"))
-                          (".local/share/dwl-guile/autostart.sh"
-                           ,(local-file "dotfiles/dwl/autostart.sh" #:recursive? #t))
-                          (".local/bin/xwrap"
-                           ,(local-file "dotfiles/x11/xwrap.sh" #:recursive? #t))
-                          (".local/share/rclip/der-cert-pub.der"
-                           ,(local-file "dotfiles/rclip/der-cert-pub.der"))
-                          (".config/rclip/config-client.toml"
-                           ,(local-file "dotfiles/rclip/config-client.toml"))
-                          (".config/emacs/init.el"
-                           ,(local-file "dotfiles/emacs/init.el"))
-                          (".config/screen/screenrc"
-                           ,(local-file "dotfiles/screen/screenrc"))))
-        (service home-dwl-guile-service-type
-                 (home-dwl-guile-configuration
-                  (package dwl-guile-latest)
-                  (native-qt? #t)
-                  (auto-start? #t)
-                  (config '())))
-        (service home-dtao-guile-service-type
-                 (home-dtao-guile-configuration
-                  (auto-start? #t)
-                  (config
-                   (dtao-config
-                    ;; A font string in fcft format.
-                    (font "monospace:style=bold:size=12")
-                    ;; Read `root', `border' and `text' colors from dwl-guile.
-                    (background-color "#331614FF")
-                    (border-color "333333FF")
-                    (foreground-color "FFFFFFFF")
-                    (padding-left 8)
-                    (padding-right 8)
-                    (padding-top 2)
-                    (padding-bottom 2)
-                    ;; Request an exclusive zone for the bar to prevent overlapping.
-                    (exclusive? #t)
-                    ;; Layer to render the bar in (LAYER-TOP, LAYER-BOTTOM, LAYER-OVERLAY, LAYER-BACKGROUND).
-                    (layer 'LAYER-BOTTOM)
-                    ;; Render the bar at the bottom of the screen.
-                    (bottom? #f)
-                    ;; Height of the bar in pixels. Set to #f for automatic height based on font size.
-                    (height #f)
-                    ;; Delimiter string of arbitrary length inserted between blocks.
-                    (delimiter #f)
-                    ;; Additional spacing on each side of the delimiter string.
-                    (block-spacing 0)
-                    (left-blocks (%tags-and-layout))
-                    (center-blocks (list
-                                    (dtao-block
-                                     (events? #t) ;; Must be enabled to correctly re-render upon event/state change
-                                     (render `(dtao:title)))))
-                    (right-blocks
-                     (list
-                      (dtao-block
-                       (interval 1)
-                       (render `(strftime "%A, %d %b (w.%V) %T" (localtime (current-time)))))))
-                    ;; List of Guile module dependencies needed to run your blocks.
-                    (modules '((ice-9 match)
-                               (ice-9 popen)
-                               (ice-9 rdelim)
-                               (srfi srfi-1)))))))
-        (simple-service
-         'change-dwl-guile
-         home-dwl-guile-service-type
-         '((setq inhibit-defaults? #t)
-           (dwl:set-tty-keys "C-M")
-           (set-layouts 'default "[M]" 'dwl:monocle
-                        'tile    "[]=" 'dwl:tile)
-           (set-keys "C-t <return>"       '(dwl:spawn "bemenu-run" "-l" "10")
-                     "C-t c"              '(dwl:spawn "foot")
-                     "C-t [62] S-c"       '(dwl:spawn "rclip-client-cli" "--command" "WRITE")
-                     "C-t [62] S-v"       '(dwl:spawn "rclip-client-cli" "--command" "READ")
-                     "C-t n"              '(dwl:focus-stack 1)
-                     "C-t p"              '(dwl:focus-stack -1)
-                     "C-t ["              '(dwl:change-masters -1)
-                     "C-t ]"              '(dwl:change-masters 1)
-                     "C-t [50] S-["       '(dwl:change-master-factor -0.05)
-                     "C-t [50] S-]"       '(dwl:change-master-factor 0.05)
-                     "C-t <tab>"          '(dwl:cycle-layout 1)
-                     "C-t <left>"         '(dwl:focus-monitor 'DIRECTION-LEFT)
-                     "C-t <right>"        '(dwl:focus-monitor 'DIRECTION-RIGHT)
-                     "C-t <up>"           '(dwl:focus-monitor 'DIRECTION-UP)
-                     "C-t <down>"         '(dwl:focus-monitor 'DIRECTION-DOWN)
-                     "C-t [50] S-<left>"  '(dwl:tag-monitor 'DIRECTION-LEFT)
-                     "C-t [50] S-<right>" '(dwl:tag-monitor 'DIRECTION-RIGHT)
-                     "C-t [50] S-<up>"    '(dwl:tag-monitor 'DIRECTION-UP)
-                     "C-t [50] S-<down>"  '(dwl:tag-monitor 'DIRECTION-DOWN)
-                     "C-t k"              'dwl:kill-client
-                     "C-t `"              'dwl:zoom
-                     "C-t [62] S-e"       'dwl:toggle-fullscreen
-                     "C-t [62] S-<space>" 'dwl:toggle-floating
-                     "C-t q"              'dwl:quit
-                     "C-t <escape>"       'dwl:quit
-                     "C-<mouse-left>"     'dwl:move
-                     "C-<mouse-middle>"   'dwl:toggle-floating
-                     "C-<mouse-right>"    'dwl:resize
-                     "C-t 1"              '(dwl:view 1)
-                     "C-t 2"              '(dwl:view 2)
-                     "C-t 3"              '(dwl:view 3)
-                     "C-t 4"              '(dwl:view 4)
-                     "C-t 5"              '(dwl:view 5)
-                     "C-t 6"              '(dwl:view 6)
-                     "C-t 7"              '(dwl:view 7)
-                     "C-t 8"              '(dwl:view 8)
-                     "C-t 9"              '(dwl:view 9)
-                     "C-t [62] S-1"       '(dwl:tag 1)
-                     "C-t [62] S-2"       '(dwl:tag 2)
-                     "C-t [62] S-3"       '(dwl:tag 3)
-                     "C-t [62] S-4"       '(dwl:tag 4)
-                     "C-t [62] S-5"       '(dwl:tag 5)
-                     "C-t [62] S-6"       '(dwl:tag 6)
-                     "C-t [62] S-7"       '(dwl:tag 7)
-                     "C-t [62] S-8"       '(dwl:tag 8)
-                     "C-t [62] S-9"       '(dwl:tag 9))
-           (add-hook! dwl:hook-startup
-                      (lambda ()
-                        (dwl:spawn (string-append
-                                    (getenv "XDG_DATA_HOME")
-                                    file-name-separator-string
-                                    "dwl-guile"
-                                    file-name-separator-string
-                                    "autostart.sh")))))))))
+  (list
+   (simple-service 'some-useful-env-vars-service
+                   home-environment-variables-service-type
+                   `(("TERM"                        . "xterm-256color")
+                     ("COLORTERM"                   . "xterm-256color")
+                     ("BEMENU_OPTS"                 . "--hf 'ffcc00FF' --tf 'ffcc00FF'")
+                     ("WLR_NO_HARDWARE_CURSORS"     . "1")
+                     ("ENV"                         . "$HOME/.kshrc")
+                     ("WLR_RENDERER_ALLOW_SOFTWARE" . "0")
+                     ("SCREENRC"                    . "$HOME/.config/screen/screenrc")))
+   (simple-service 'dot-configs-service
+                   home-files-service-type
+                   `((".config/foot/foot.ini" ,(local-file "dotfiles/foot/foot.ini"))
+                     (".kshrc" ,(local-file "dotfiles/ksh/kshrc"))
+                     (".local/share/dwl-guile/autostart.sh"
+                      ,(local-file "dotfiles/dwl/autostart.sh" #:recursive? #t))
+                     (".local/bin/xwrap"
+                      ,(local-file "dotfiles/x11/xwrap.sh" #:recursive? #t))
+                     (".local/share/rclip/der-cert-pub.der"
+                      ,(local-file "dotfiles/rclip/der-cert-pub.der"))
+                     (".config/rclip/config-client.toml"
+                      ,(local-file "dotfiles/rclip/config-client.toml"))
+                     (".config/emacs/init.el"
+                      ,(local-file "dotfiles/emacs/init.el"))
+                     (".config/screen/screenrc"
+                      ,(local-file "dotfiles/screen/screenrc"))))
+   (service home-dwl-guile-service-type
+            (home-dwl-guile-configuration
+             (package
+              (patch-dwl-guile-package dwl-guile-latest
+                                       #:patches (list %patch-xwayland)))
+             (native-qt? #t)
+             (auto-start? #t)
+             (config '())))
+   (service home-dtao-guile-service-type
+            (home-dtao-guile-configuration
+             (auto-start? #t)
+             (config
+              (dtao-config
+               ;; A font string in fcft format.
+               (font "monospace:style=bold:size=12")
+               ;; Read `root', `border' and `text' colors from dwl-guile.
+               (background-color "#331614FF")
+               (border-color "333333FF")
+               (foreground-color "FFFFFFFF")
+               (padding-left 8)
+               (padding-right 8)
+               (padding-top 2)
+               (padding-bottom 2)
+               ;; Request an exclusive zone for the bar to prevent overlapping.
+               (exclusive? #t)
+               ;; Layer to render the bar in (LAYER-TOP, LAYER-BOTTOM, LAYER-OVERLAY, LAYER-BACKGROUND).
+               (layer 'LAYER-BOTTOM)
+               ;; Render the bar at the bottom of the screen.
+               (bottom? #f)
+               ;; Height of the bar in pixels. Set to #f for automatic height based on font size.
+               (height #f)
+               ;; Delimiter string of arbitrary length inserted between blocks.
+               (delimiter #f)
+               ;; Additional spacing on each side of the delimiter string.
+               (block-spacing 0)
+               (left-blocks (%tags-and-layout))
+               (center-blocks (list
+                               (dtao-block
+                                (events? #t) ;; Must be enabled to correctly re-render upon event/state change
+                                (render `(dtao:title)))))
+               (right-blocks
+                (list
+                 (dtao-block
+                  (interval 1)
+                  (render `(strftime "%A, %d %b (w.%V) %T" (localtime (current-time)))))))
+               ;; List of Guile module dependencies needed to run your blocks.
+               (modules '((ice-9 match)
+                          (ice-9 popen)
+                          (ice-9 rdelim)
+                          (srfi srfi-1)))))))
+   (simple-service
+    'change-dwl-guile
+    home-dwl-guile-service-type
+    '((setq inhibit-defaults? #t)
+      (dwl:set-tty-keys "C-M")
+      (set-layouts 'default "[M]"    'dwl:monocle
+                   'tile    "[]="    'dwl:tile)
+      (set-keys "C-t <return>"       '(dwl:spawn "bemenu-run" "-l" "10")
+                "C-t c"              '(dwl:spawn "foot")
+                "C-t [62] S-c"       '(dwl:spawn "rclip-client-cli" "--command" "WRITE")
+                "C-t [62] S-v"       '(dwl:spawn "rclip-client-cli" "--command" "READ")
+                "C-t n"              '(dwl:focus-stack 1)
+                "C-t p"              '(dwl:focus-stack -1)
+                "C-t ["              '(dwl:change-masters -1)
+                "C-t ]"              '(dwl:change-masters 1)
+                "C-t [50] S-["       '(dwl:change-master-factor -0.05)
+                "C-t [50] S-]"       '(dwl:change-master-factor 0.05)
+                "C-t <tab>"          '(dwl:cycle-layout 1)
+                "C-t <left>"         '(dwl:focus-monitor 'DIRECTION-LEFT)
+                "C-t <right>"        '(dwl:focus-monitor 'DIRECTION-RIGHT)
+                "C-t <up>"           '(dwl:focus-monitor 'DIRECTION-UP)
+                "C-t <down>"         '(dwl:focus-monitor 'DIRECTION-DOWN)
+                "C-t [50] S-<left>"  '(dwl:tag-monitor 'DIRECTION-LEFT)
+                "C-t [50] S-<right>" '(dwl:tag-monitor 'DIRECTION-RIGHT)
+                "C-t [50] S-<up>"    '(dwl:tag-monitor 'DIRECTION-UP)
+                "C-t [50] S-<down>"  '(dwl:tag-monitor 'DIRECTION-DOWN)
+                "C-t k"              'dwl:kill-client
+                "C-t `"              'dwl:zoom
+                "C-t [62] S-e"       'dwl:toggle-fullscreen
+                "C-t [62] S-<space>" 'dwl:toggle-floating
+                "C-t q"              'dwl:quit
+                "C-t <escape>"       'dwl:quit
+                "C-<mouse-left>"     'dwl:move
+                "C-<mouse-middle>"   'dwl:toggle-floating
+                "C-<mouse-right>"    'dwl:resize
+                "C-t 1"              '(dwl:view 1)
+                "C-t 2"              '(dwl:view 2)
+                "C-t 3"              '(dwl:view 3)
+                "C-t 4"              '(dwl:view 4)
+                "C-t 5"              '(dwl:view 5)
+                "C-t 6"              '(dwl:view 6)
+                "C-t 7"              '(dwl:view 7)
+                "C-t 8"              '(dwl:view 8)
+                "C-t 9"              '(dwl:view 9)
+                "C-t [62] S-1"       '(dwl:tag 1)
+                "C-t [62] S-2"       '(dwl:tag 2)
+                "C-t [62] S-3"       '(dwl:tag 3)
+                "C-t [62] S-4"       '(dwl:tag 4)
+                "C-t [62] S-5"       '(dwl:tag 5)
+                "C-t [62] S-6"       '(dwl:tag 6)
+                "C-t [62] S-7"       '(dwl:tag 7)
+                "C-t [62] S-8"       '(dwl:tag 8)
+                "C-t [62] S-9"       '(dwl:tag 9))
+      (add-hook! dwl:hook-startup
+                 (lambda ()
+                   (dwl:spawn (string-append
+                               (getenv "XDG_DATA_HOME")
+                               file-name-separator-string
+                               "dwl-guile"
+                               file-name-separator-string
+                               "autostart.sh")))))))))
