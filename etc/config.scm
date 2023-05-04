@@ -7,7 +7,7 @@
  (ice-9 rdelim)
  (ice-9 format))
 (use-service-modules networking ssh authentication desktop dbus)
-(use-package-modules certs)
+(use-package-modules certs shells)
 
 (define %device-partition-efi  "/dev/sda1")
 (define %device-partition-root "/dev/sda2")
@@ -22,31 +22,33 @@
                (comment "user")
                (group "users")
                (home-directory "/home/user")
+               (shell #~(string-append #$oksh "/bin/ksh"))
                (supplementary-groups
                 '("wheel" "netdev" "input" "kvm" "cdrom" "audio" "video" "tty")))
               %base-user-accounts))
  (packages (append (map specification->package+output
-                        '("screen"
-                          "emacs-next-pgtk"
-                          "git-minimal"
-                          "rsync"
-                          "btrfs-progs"
-                          "gnupg"
-                          "curl"
-                          "polkit"
-                          "nss-certs"
-                          "dbus"
-                          "cryptsetup"
-                          "rsync"
-                          "openssl"
-                          "libusb"
-                          "dosfstools"))
+			'("screen"
+			  "emacs-next-pgtk"
+			  "oksh"
+			  "git-minimal"
+			  "rsync"
+			  "btrfs-progs"
+			  "gnupg"
+			  "curl"
+			  "polkit"
+			  "nss-certs"
+			  "dbus"
+			  "cryptsetup"
+			  "rsync"
+			  "openssl"
+			  "libusb"
+			  "dosfstools"))		    
                    %base-packages))
  (services (append (list (service dhcp-client-service-type)
                          (service openssh-service-type)
-                         (service accountsservice-service-type)
-                         (service elogind-service-type))
-                   %base-services))
+			 (service accountsservice-service-type)
+			 (service elogind-service-type))
+		   %base-services))
  (bootloader (bootloader-configuration
               (bootloader grub-efi-removable-bootloader)
               (targets '("/boot/efi"))
@@ -54,13 +56,13 @@
               (keyboard-layout keyboard-layout)))
  (mapped-devices
   (list (mapped-device
-         (source
-          (uuid (let* ((port (open-input-pipe (format #f "blkid -s UUID -o value ~a" %device-partition-root)))
-                       (str (read-line port)))
-                  (close-pipe port)
-                  str)))
-         (target "guixsdvm")
-         (type luks-device-mapping))))
+	 (source
+	  (uuid (let* ((port (open-input-pipe (format #f "blkid -s UUID -o value ~a" %device-partition-root)))
+		       (str (read-line port)))
+		  (close-pipe port)
+		  str)))
+	 (target "guixsdvm")
+	 (type luks-device-mapping))))
  (file-systems
   (cons*
    (file-system
@@ -109,16 +111,15 @@
     (mount-point "/boot/efi")
     (device
      (uuid (let* ((port (open-input-pipe (format #f "blkid -s UUID -o value ~a" %device-partition-efi)))
-                  (str (read-line port)))
-             (close-pipe port)
-             str)
-           'fat32))
+		  (str (read-line port)))
+	     (close-pipe port)
+	     str)
+	   'fat32))
     (type "vfat"))
    %base-file-systems))
  (swap-devices
   (list
    (swap-space
     (target "/swap/swapfile")
-    (dependencies (filter (file-system-mount-point-predicate "/swap")
-                          file-systems))))))
+    (dependencies file-systems)))))
 
