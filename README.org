@@ -3,17 +3,11 @@
 This document describes my [[https://guix.gnu.org/][Gnu Guix System]] setup for a virtual machine installation ([[https://www.qemu.org/][QEMU]] for me).
 - This is for a =UEFI= installation that can be performed remotely via SSH (easy copy/paste of notes, etc.)
 - The installation uses [[https://btrfs.readthedocs.io/en/latest/][BTRFS]] instead of [[https://wikiless.org/wiki/Logical_Volume_Manager_(Linux)?lang=en][LVM]], with full disk encryption ([[https://wikiless.org/wiki/Linux_Unified_Key_Setup?lang=en][LUKS]])
-- The core installation is minimal
-  - Only new basic utilities are globally installed
-  - You're expected to add additional softare for a given non-admin user (called =user= in this guide)
-    - I use the [[https://guix.gnu.org/manual/en/html_node/Home-Configuration.html][Guix home environments support]] to easily manage my user-level setup
-    - I prefer a simple "hackable" window manager instead of a full desktop
-      - I'm experimenting with [[https://wayland.freedesktop.org/][Wayland]] lately instead of [[https://www.x.org/wiki/][X.Org]]
-      - For now, I'm more comfortable with [[https://github.com/djpohly/dwl/][DWL]] which is essentially a [[https://dwm.suckless.org/][dwm]] =Wayland= port
+- The core installation itself is minimal and the user specific software packages feature [[https://github.com/djpohly/dwl/][DWL]] ([[https://dwm.suckless.org/][dwm]] for =Wayland=)
 
 My initial goal is to contribute to Open Source projects from a Guix environment.
 - My main machine runs few dedicated virtual machines (VM) a la [[https://www.qubes-os.org/intro/][Qubes OS]] (=vault-vm=, =personal-vm=, =dev-vm=, etc.)
-- Gnu Guix System would be dedicated to open source contributions
+- =Gnu Guix System= would be dedicated to open source contributions
   
 * Enable remote installation
 
@@ -50,7 +44,7 @@ Encrypt the main partition.
 #+end_src
 
 ** Open LUKS device
-21M4;20M
+
 Open the encrypted device.
 
 #+begin_src sh
@@ -119,7 +113,7 @@ You can now reboot into your new system (shutdown/start or reboot depending on y
 
 ** Update passwords
 
-The passwords for the =root= and =user= users are initially not set.
+Both passwords for the =root= and =user= users are initially empty.
 
 Let's login as =root= and change that.
 
@@ -152,7 +146,7 @@ Connect to the machine remotely (=ssh user@localhost -p 62000= in my case).
 
 ** User environment setup
 
-This will setup a minimal [[https://arewewaylandyet.com/][Wayland]] graphical environment with a [[https://github.com/yveszoundi/dwl-customization][custom DWL build]] (via [[https://guix.gnu.org/manual/devel/en/html_node/Home-Configuration.html][Guix home configuration management]]).
+This will setup a minimal [[https://arewewaylandyet.com/][Wayland]] graphical environment with [[https://github.com/engstrand-config/dwl-guile][dwl-guile]] (via [[https://guix.gnu.org/manual/devel/en/html_node/Home-Configuration.html][Guix home configuration management]]).
 - It is assumed have you've pulled the contents of this =git= repository on your new Guix installation
 - We'll then be able to quickly have a system up and running
  
