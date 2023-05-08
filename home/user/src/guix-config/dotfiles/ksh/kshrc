@@ -27,9 +27,21 @@ else
     PS1='\u@\h \w\$ '
 fi
 
+HISTSIZE=4096
+HISTFILE=$HOME/.history
+COLORTERM=24bit
+export HISTSIZE HISTFILE COLORTERM
+
 alias ls='ls -p --color=auto'
 alias ll='ls -l'
+alias la='ls -al'
 alias grep='grep --color=auto'
+alias em='emacs -nw'
+alias emd='emacs --daemon'
+alias ec='emacsclient -nw -c -t'
+alias clear='printf "\033[H\033[2J"'
+
+bind -m '^L'=^U\ clear'^J^Y'
 
 window_restore() {
 	wlr-randr --output Virtual-1 --mode 1440x900

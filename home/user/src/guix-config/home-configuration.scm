@@ -166,15 +166,16 @@
  ;; (packages (specifications->packages (list "openssl@3.0.7")))
  (packages (append
             (map specification->package+output
-                 '("bemenu" "foot" "neofetch" "wlr-randr" "wl-clipboard"                   
-                   "pcmanfm" "arc-icon-theme" "adwaita-icon-theme" "lxqt-qtplugin"
-                   "pinentry-emacs" "jq" "qtwayland" "egl-wayland" "xwininfo"
-                   "swaybg" "imv" "zathura" "zathura-pdf-mupdf" "icecat"
-			       "emacs-next-pgtk" "emacs-pinentry" "emacs-systemd-mode" 
-                   "emacs-dockerfile-mode" "emacs-avy" "emacs-rust-mode" "emacs-move-text"
-                   "emacs-xclip" "emacs-markdown-mode" "emacs-jinja2-mode" "emacs-dockerfile-mode"
-                   "emacs-rainbow-mode" "emacs-markdown-mode" "emacs-yaml-mode"
-                   "emacs-pinentry" "emacs-systemd-mode"))
+                 '("bemenu" "foot" "neofetch" "icecat"
+                   "wlr-randr" "wl-clipboard" "swaybg" "imv"
+                   "qtwayland" "lxqt-qtplugin" "jq"  "egl-wayland" "xwininfo"
+                   "pcmanfm" "arc-icon-theme" "adwaita-icon-theme"
+                   "zathura" "zathura-pdf-mupdf" "pinentry-emacs"
+                    "emacs-next-pgtk" "emacs-pinentry" "emacs-systemd-mode"
+                   "emacs-move-text" "emacs-dockerfile-mode" "emacs-pinentry"
+                   "emacs-dockerfile-mode" "emacs-avy" "emacs-rust-mode"
+                   "emacs-xclip" "emacs-markdown-mode" "emacs-jinja2-mode"
+                   "emacs-rainbow-mode" "emacs-markdown-mode" "emacs-yaml-mode"))
             (list emacs-rimero-theme wbg rclip-client-cli)))
 
  ;; Below is the list of Home services.  To search for available
