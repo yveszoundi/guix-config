@@ -137,23 +137,10 @@
     (unless package-archive-contents
       (package-refresh-contents))
 
-    (dolist (p package-selected-packages)
+    '(dolist (p package-selected-packages)
       (unless (package-installed-p p)
         (progn
-          (package-install p))))
-
-    (defun ers/setup-package-sorting ()
-      (setq tabulated-list-format
-            (vconcat
-             (mapcar
-              (lambda (arg)
-                (list
-                 (nth 0 arg)
-                 (nth 1 arg)
-                 (or (nth 2 arg) t)))
-              tabulated-list-format))))
-
-    '(add-hook 'package-menu-mode-hook #'ers/setup-package-sorting)))
+          (package-install p))))))
 
 ;;;; guix-emacs-packages
 (load-file (expand-file-name "~/.guix-home/profile/share/emacs/site-lisp/subdirs.el"))
@@ -265,10 +252,10 @@
 
     (defun ers/colorize-compilation-buffer ()
       (let ((inhibit-read-only t))
-        (ansi-color-apply-on-region (point-min) (point-max))))
+        (ansi-color-apply-on-region (point-min)
+                                    (point-max))))
 
     '(add-hook 'compilation-filter-hook #'ers/colorize-compilation-buffer)))
-
 
 ;;;; hippie-expand
 (eval-after-load 'hippie-exp
@@ -402,14 +389,12 @@
 (global-set-key (kbd "C-h C-r") #'ers/revert-buffer-no-confirm)
 (global-set-key (kbd "C-x M-k") #'ers/kill-buffer-no-confirm)
 
-
 ;;;; dired
 (eval-after-load 'dired
   (progn
     (defun ers/dired-setup ()
       (interactive)
-      (require 'dired-x)
-      (require 'ls-lisp)
+      (mapc 'require '(dired-x ls-lisp))
       (dired-hide-details-mode 1)
       (define-key dired-mode-map "." #'dired-up-directory))
 
@@ -420,82 +405,6 @@
 
 ;;;; prog-modes
 (add-hook 'prog-mode-hook #'electric-pair-local-mode)
-
-
-;;;; python
-(setq-default python-indent 2)
-
-;;;; vc
-(eval-after-load 'vc-git
-  (progn
-    (require 'vc-git)
-
-    (defun ers/vc-git-clone ()
-      "Clone a git repository."
-      (interactive)
-      (let* ((repo-url         (read-string "Repository URL: " (format "https://github.com/%s/" user-login-name)))
-             (dest-folder-name (file-name-nondirectory (file-name-sans-extension repo-url)))
-             (repo-dir         (read-directory-name "Destination Folder: "
-                                                    (expand-file-name dest-folder-name
-                                                                      default-directory))))
-        (progn
-          (ers/mkdir-p repo-dir)
-          (let ((default-directory repo-dir))
-            (vc-git-command nil 0 nil "clone" repo-url)))))
-
-    (defun ers/vc-push-tags ()
-      "Push git tags."
-      (interactive)
-      (vc-git-command nil 0 nil "push" "origin" "--tags"))
-
-    (defun ers--/gitflow-branches (flow-type)
-      "Return git branches for a given FLOW-TYPE."
-      (delq nil
-            (mapcar
-             (lambda (item)
-               (if (string-prefix-p flow-type item)
-                   (substring item (+ 1 (length flow-type)))
-                 nil))
-             (vc-git-branches))))
-
-    (defun ers--/gitflow-command (flow-type flow-action)
-      "Execute a git FLOW-ACTION for a given FLOW-TYPE."
-      (let ((branch-name (if (not (string-equal "start" flow-action))
-                             (completing-read "Branch name: "
-                                              (ers--/gitflow-branches flow-type)
-                                              nil
-                                              nil)
-                           (read-string "Branch name: "))))
-        (progn
-          (vc-git-command nil 0 nil "flow" flow-type flow-action branch-name)
-          (call-interactively 'revert-buffer))))
-
-    (defun ers--/gitflow-make-defun (defun-name flow-type flow-action)
-      "Execute a git FLOW-ACTION for a given FLOW-TYPE."
-      `(defun ,defun-name ()
-         (interactive)
-         (funcall 'ers--/gitflow-command ,flow-type ,flow-action)))
-
-    (defmacro ers--/gitflow-make-defuns (flow-type flow-actions)
-      "Generate a set of git flow functions for a given FLOW-TYPE and its FLOW-ACTIONS."
-      `(progn
-         ,@(mapcar
-            (lambda (flow-action)
-              (ers--/gitflow-make-defun (intern (concat "ers/gitflow-"
-                                                        flow-type
-                                                        "-"
-                                                        flow-action))
-                                        `,flow-type
-                                        flow-action))
-            flow-actions)))
-
-    (ers--/gitflow-make-defuns "bugfix"  ("start" "finish" "publish"))
-    (ers--/gitflow-make-defuns "hotfix"  ("start" "finish" "publish"))
-    (ers--/gitflow-make-defuns "feature" ("start" "finish" "publish"))
-    (ers--/gitflow-make-defuns "release" ("start" "finish" "publish"))
-
-    (global-set-key (kbd "C-x vt") #'ers/vc-push-tags)
-    '(global-set-key (kbd "C-x vc") #'ers/vc-git-clone)))
 
 ;;;; registers
 (set-register ?i `(file . ,user-init-file))
