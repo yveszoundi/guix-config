@@ -10,6 +10,7 @@
              (gnu packages datastructures)
              (gnu packages tls)
              (gnu packages pkg-config)
+             (gnu packages perl)
              (gnu packages crates-io)
              (gnu packages wm)
              (gnu packages crates-graphics)
@@ -125,7 +126,8 @@
        ("rust-serde-derive"    ,rust-serde-derive-1)
        ("rust-toml"            ,rust-toml-0.5))))
    (native-inputs
-    `(("pkg-config" ,pkg-config)))
+    `(("perl" ,perl)
+      ("pkg-config" ,pkg-config)))
    (home-page
     "https://github.com/yveszoundi/rclip")
    (synopsis
