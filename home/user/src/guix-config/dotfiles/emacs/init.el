@@ -51,21 +51,6 @@
  '(indent-tabs-mode nil)
  '(inhibit-startup-screen t)
  '(js-indent-level 2)
- '(linum-format
-   (lambda
-     (line)
-     (let
-         ((w
-           (length
-            (number-to-string
-             (count-lines
-              (point-min)
-              (point-max))))))
-       (propertize
-        (format
-         (format " %%%dd " w)
-         line)
-        'face 'linum))))
  '(ls-lisp-dirs-first t)
  '(ls-lisp-use-insert-directory-program nil)
  '(menu-bar-mode nil)
