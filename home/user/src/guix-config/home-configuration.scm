@@ -71,70 +71,70 @@
      (license license:gpl3+))))
 
 (define-public wbg
-  4;109;9M  (package
-  (name "wbg")
-  (version "1.0.2")
-  (source
-   (origin
-    (method git-fetch)
-    (uri (git-reference
-          (url "https://codeberg.org/dnkl/wbg")
-          (commit version)))
-    (file-name (git-file-name name version))
-    (sha256
-     (base32
-      "182cyp97lxwxl5r6f25irvm62ii0j1knmpwlpwa1w00j2xchx89w"))))
-  (build-system meson-build-system)
-  (arguments
-   `(#:build-type "release"))
-  (native-inputs
-   (list pkg-config wayland-protocols gcc-10 tllist))
-  (inputs
-   (list wlroots wayland pixman libpng libjpeg-turbo))
-  (license license:expat)
-  (home-page "https://codeberg.org/dnkl/wbg")
-  (synopsis "Super simple wallpaper application for Wayland compositors")
-  (description "Super simple wallpaper application for
+  (package
+   (name "wbg")
+   (version "1.0.2")
+   (source
+    (origin
+     (method git-fetch)
+     (uri (git-reference
+           (url "https://codeberg.org/dnkl/wbg")
+           (commit version)))
+     (file-name (git-file-name name version))
+     (sha256
+      (base32
+       "182cyp97lxwxl5r6f25irvm62ii0j1knmpwlpwa1w00j2xchx89w"))))
+   (build-system meson-build-system)
+   (arguments
+    `(#:build-type "release"))
+   (native-inputs
+    (list pkg-config wayland-protocols gcc-10 tllist))
+   (inputs
+    (list wlroots wayland pixman libpng libjpeg-turbo))
+   (license license:expat)
+   (home-page "https://codeberg.org/dnkl/wbg")
+   (synopsis "Super simple wallpaper application for Wayland compositors")
+   (description "Super simple wallpaper application for
                               Wayland compositors implementing the layer-shell protocol.")))
 
 (define rclip-client-cli
-(let ((commit "35942b1735a307759bfa6ac9eeb07a740044b96a"))
-  (package
-   (name "rclip-client-cli")
-   (version (string-append "1.0.3" "-" (string-take commit 8)))
-   (source (origin
-            (method git-fetch)
-            (uri (git-reference
-                  (url "https://github.com/yveszoundi/guix-rclip-client-cli-wayland")
-                  (commit commit)))
-            (file-name (git-file-name name version))
-            (sha256
-             (base32
-              "0q8ly3f0wxkx4bwall6fj3842mb8p2d008h5flcagc5cs69fzh88"))))
-   (build-system cargo-build-system)
-   (arguments
-    `(#:cargo-inputs
-      (("rust-clap"            ,rust-clap-3)
-       ("rust-nix"             ,rust-nix-0.26)
-       ("rust-rustls"          ,rust-rustls-0.20)
-       ("rust-wayland-sys"     ,rust-wayland-sys-0.28)
-       ("rust-wayland-scanner" ,rust-wayland-scanner-0.28)
-       ("rust-dirs"            ,rust-dirs-4)
-       ("rust-xml-rs"          ,rust-xml-rs-0.8)
-       ("rust-wl-clipboard-rs" ,rust-wl-clipboard-rs-0.4)
-       ("rust-serde"           ,rust-serde-1)
-       ("rust-serde-derive"    ,rust-serde-derive-1)
-       ("rust-toml"            ,rust-toml-0.5))))
-   (native-inputs
-    `(("perl" ,perl)
-      ("pkg-config" ,pkg-config)))
-   (home-page
-    "https://github.com/yveszoundi/rclip")
-   (synopsis
-    "Share clipboard text over a network.")
-   (description
-    "Simple clipboard utility for sharing text over a network.")
-   (license license:gpl3+))))
+  (let ((commit "35942b1735a307759bfa6ac9eeb07a740044b96a"))
+    (package
+     (name "rclip-client-cli")
+     (version (string-append "1.0.3" "-" (string-take commit 8)))
+     (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                    (url "https://github.com/yveszoundi/guix-rclip-client-cli-wayland")
+                    (commit commit)))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32
+                "0q8ly3f0wxkx4bwall6fj3842mb8p2d008h5flcagc5cs69fzh88"))))
+     (build-system cargo-build-system)
+     (arguments
+      `(#:cargo-inputs
+        (("rust-clap"            ,rust-clap-3)
+         ("rust-nix"             ,rust-nix-0.26)
+         ("rust-rustls"          ,rust-rustls-0.20)
+         ("rust-wayland-sys"     ,rust-wayland-sys-0.28)
+         ("rust-wayland-scanner" ,rust-wayland-scanner-0.28)
+         ("rust-dirs"            ,rust-dirs-4)
+         ("rust-xml-rs"          ,rust-xml-rs-0.8)
+         ("rust-wl-clipboard-rs" ,rust-wl-clipboard-rs-0.4)
+         ("rust-serde"           ,rust-serde-1)
+         ("rust-serde-derive"    ,rust-serde-derive-1)
+         ("rust-toml"            ,rust-toml-0.5))))
+     (native-inputs
+      `(("perl" ,perl)
+        ("pkg-config" ,pkg-config)))
+     (home-page
+      "https://github.com/yveszoundi/rclip")
+     (synopsis
+      "Share clipboard text over a network.")
+     (description
+      "Simple clipboard utility for sharing text over a network.")
+     (license license:gpl3+))))
 
 (define (%tags-and-layout)
   (append
@@ -179,7 +179,6 @@
                    "emacs-xclip" "emacs-markdown-mode" "emacs-jinja2-mode"
                    "emacs-rainbow-mode" "emacs-markdown-mode" "emacs-yaml-mode"))
             (list emacs-rimero-theme wbg rclip-client-cli)))
-
  ;; Below is the list of Home services.  To search for available
  ;; services, run 'guix home search KEYWORD' in a terminal.
  (services
