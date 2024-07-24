@@ -3,7 +3,9 @@
 This document describes my [[https://guix.gnu.org/][Gnu Guix System]] setup for a virtual machine installation ([[https://www.qemu.org/][QEMU]] for me).
 - This is for a =UEFI= installation that can be performed remotely via SSH (easy copy/paste of notes, etc.)
 - The installation uses [[https://btrfs.readthedocs.io/en/latest/][BTRFS]] instead of [[https://wikiless.org/wiki/Logical_Volume_Manager_(Linux)?lang=en][LVM]], with full disk encryption ([[https://wikiless.org/wiki/Linux_Unified_Key_Setup?lang=en][LUKS]])
-- The core installation itself is minimal and the user specific software packages feature [[https://github.com/djpohly/dwl/][DWL]] ([[https://dwm.suckless.org/][dwm]] for =Wayland=)
+- The core installation itself is minimal
+  - The user specific software packages include [[https://swaywm.org/][Sway]] ([[https://i3wm.org/][i3]] for =Wayland=), [[https://librewolf.net/][Librewolf]]. See [[./home/user/src/guix-config/home-configuration.scm][home/user/src/guix-config/home-configuration.scm]]
+  - =Sway= is configured with Ratpoison-like keybindings (=C-t= prefix)
 
 My initial goal is to contribute to Open Source projects from a Guix environment.
 - My main machine runs few dedicated virtual machines (VM) a la [[https://www.qubes-os.org/intro/][Qubes OS]] (=vault-vm=, =personal-vm=, =dev-vm=, etc.)
@@ -48,7 +50,7 @@ Encrypt the main partition.
 Open the encrypted device.
 
 #+begin_src sh
-  cryptsetup luksOpen /dev/sda2 guixsdvm
+  cryptsetup luksOpen /dev/sda2 guixvm
 #+end_src
 
 ** Prepare installation
@@ -56,9 +58,9 @@ Open the encrypted device.
 Run all the commands below to configure partitions and setup filesystems.
 
 #+begin_src sh
-  mkfs.btrfs -L guixroot /dev/mapper/guixsdvm
+  mkfs.btrfs -L guixroot /dev/mapper/guixvm
 
-  mount -t btrfs /dev/mapper/guixsdvm /mnt
+  mount -t btrfs /dev/mapper/guixvm /mnt
 
   btrfs subvolume create /mnt/root
   btrfs subvolume create /mnt/boot
@@ -73,14 +75,14 @@ Run all the commands below to configure partitions and setup filesystems.
 
   umount /mnt
 
-  mount -o subvol=root /dev/mapper/guixsdvm /mnt
+  mount -o subvol=root /dev/mapper/guixvm /mnt
   mkdir -p /mnt/home /mnt/gnu /mnt/data /mnt/var/log /mnt/boot /mnt/swap
-  mount -o subvol=home /dev/mapper/guixsdvm /mnt/home
-  mount -o subvol=gnu  /dev/mapper/guixsdvm /mnt/gnu
-  mount -o subvol=data /dev/mapper/guixsdvm /mnt/data
-  mount -o subvol=log  /dev/mapper/guixsdvm /mnt/var/log
-  mount -o subvol=boot /dev/mapper/guixsdvm /mnt/boot
-  mount -o subvol=swap /dev/mapper/guixsdvm /mnt/swap
+  mount -o subvol=home /dev/mapper/guixvm /mnt/home
+  mount -o subvol=gnu  /dev/mapper/guixvm /mnt/gnu
+  mount -o subvol=data /dev/mapper/guixvm /mnt/data
+  mount -o subvol=log  /dev/mapper/guixvm /mnt/var/log
+  mount -o subvol=boot /dev/mapper/guixvm /mnt/boot
+  mount -o subvol=swap /dev/mapper/guixvm /mnt/swap
 
   mkfs.vfat /dev/sda1
   mkdir -p /mnt/boot/efi
@@ -146,7 +148,7 @@ Connect to the machine remotely (=ssh user@localhost -p 62000= in my case).
 
 ** User environment setup
 
-This will setup a minimal [[https://arewewaylandyet.com/][Wayland]] graphical environment with [[https://github.com/engstrand-config/dwl-guile][dwl-guile]] (via [[https://guix.gnu.org/manual/devel/en/html_node/Home-Configuration.html][Guix home configuration management]]).
+This will setup a minimal [[https://arewewaylandyet.com/][Wayland]] graphical environment with [[https://swaywm.org/][Sway]] (via [[https://guix.gnu.org/manual/devel/en/html_node/Home-Configuration.html][Guix home configuration management]]).
 - It is assumed have you've pulled the contents of this =git= repository on your new Guix installation
 - We'll then be able to quickly have a system up and running
  
@@ -157,13 +159,12 @@ This will setup a minimal [[https://arewewaylandyet.com/][Wayland]] graphical en
   cd ~/Downloads
   git clone https://github.com/yveszoundi/guix-config
   cp -rf home/user/src ~/
-  cp home/user/.config/guix/channels.scm ~/.config/guix/
-  guix pull
+  cp -rf home/user/Pictures ~/
   guix home reconfigure ~/src/guix-config/home-configuration.scm
   cd -
 #+end_src
 
-Upon first login in the =tty=, the =dwl= window manager will be started.
+After first login in the =tty=, type =sway= on the command-line to start the window manager.
 
 * Additional notes
   
@@ -185,7 +186,6 @@ If the UI doesn't start, the QEMU parameter =-vga qxl= seems to avoid issues wit
 - https://guix.gnu.org/manual/en/html_node/Essential-Home-Services.html
 - https://git.sr.ht/~raghavgururajan/guix-config
 - https://git.sr.ht/~boeg/home/tree/master/.config/guix/system/config.scm
-- https://github.com/engstrand-config/dwl-guile
 - https://github.com/yenda/guix-config/blob/master/readme.org
 - https://www.youtube.com/watch?v=XOYirIzUlW8
 

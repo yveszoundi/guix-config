@@ -1,0 +1,94 @@
+# Wayland Sway configuration file: https://swaywm.org
+# This is located at $HOME/.config/sway/config
+# This uses stumpwm/ratpoison style keybindings with a prefix key
+# This is derived from w96k dotfiles: https://git.sr.ht/~w96k/dotfiles/tree/master/item/guix/.config/sway/config
+# This matches relatively closely the custom configuration that I use with DWL: https://codeberg.org/dwl/dwl
+
+set $term foot
+set $StumpMod Control+t 
+set $left h
+set $down j
+set $up k
+set $right l
+
+assign [app_id="emacs"]   workspace number 3
+assign [app_id="librewolf-default"] workspace number 9
+
+workspace_layout tabbed
+
+output Virtual-1 mode 1440x900 pos 0 0 bg ~/Pictures/wallpaper.png stretch
+
+bar {
+  swaybar_command waybar
+}
+
+workspace 1 output Virtual-1
+workspace 2 output Virtual-1
+workspace 3 output Virtual-1
+workspace 4 output Virtual-1
+workspace 5 output Virtual-1
+workspace 6 output Virtual-1
+workspace 7 output Virtual-1
+workspace 8 output Virtual-1
+workspace 9 output Virtual-1
+
+mode "stumpwm" {
+  # Would be nice to have exit from mode after each bind
+  bindsym --to-code {
+    # Launch emacs
+    e exec emacs; workspace "Editor"; mode default;
+
+    # Rclip
+    Shift+c mode default; exec "rclip-client-cli --command WRITE"
+    Shift+v mode default; exec "rclip-client-cli --command READ"
+
+    # Launch terminal
+    c mode default; exec $term;
+   
+    # Kill window
+    k kill; mode default;
+   
+    # Navigation
+    n focus next sibling; mode default;
+    p focus prev sibling; mode default;
+   
+    b fullscreen toggle
+   
+    # Switch to previous workspace
+    t workspace current; mode default;
+    Control+t workspace current; mode default;
+
+    # app launcher menu
+    Return mode default; exec "bemenu-run -l 10";
+   
+    # Exit stumpwmm mode
+    g mode default;
+    
+    Control+g mode default;
+   
+    # Select workspace with corresponding digit
+    1 workspace 1; mode default;
+    2 workspace 2; mode default;
+    3 workspace 3; mode default;
+    4 workspace 4; mode default;
+    5 workspace 5; mode default;
+    6 workspace 6; mode default;
+    7 workspace 7; mode default;
+    8 workspace 8; mode default;
+    9 workspace 9; mode default;
+   
+    Shift+1 move container to workspace 1; workspace 1; mode default;
+    Shift+2 move container to workspace 2; workspace 2; mode default;
+    Shift+3 move container to workspace 3; workspace 3; mode default;
+    Shift+4 move container to workspace 4; workspace 4; mode default;
+    Shift+5 move container to workspace 5; workspace 5; mode default;
+    Shift+6 move container to workspace 6; workspace 6; mode default;
+    Shift+7 move container to workspace 7; workspace 7; mode default;
+    Shift+8 move container to workspace 8; workspace 8; mode default;
+    Shift+9 move container to workspace 9; workspace 9; mode default;
+   
+    q exec --no-startup-id "swaymsg exit"
+  }
+}
+
+bindsym --to-code $StumpMod mode "stumpwm"

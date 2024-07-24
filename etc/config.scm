@@ -1,5 +1,6 @@
 (use-modules
  (gnu)
+ (gnu services)
  (gnu system nss)
  (guix utils)
  (gnu services desktop)
@@ -12,14 +13,17 @@
 (define %device-partition-efi  "/dev/sda1")
 (define %device-partition-root "/dev/sda2")
 
+(define e1000-config
+  (plain-file "e1000.conf" "alias eth0 e1000"))
+
 (operating-system
  (locale "en_US.utf8")
  (timezone "America/Toronto")
  (keyboard-layout (keyboard-layout "us"))
- (host-name "oss-guixvm")
+ (host-name "personal-guix")
  (users (cons (user-account
                (name "user")
-               (comment "user")
+               (comment "Guix user")
                (group "users")
                (home-directory "/home/user")
                (shell #~(string-append #$oksh "/bin/ksh"))
@@ -32,10 +36,10 @@
                           "git-minimal"
                           "rsync"
                           "btrfs-progs"
+                          "nss-certs"
                           "gnupg"
                           "curl"
                           "polkit"
-                          "nss-certs"
                           "dbus"
                           "cryptsetup"
                           "rsync"
@@ -43,7 +47,9 @@
                           "libusb"
                           "dosfstools"))
                    %base-packages))
- (services (append (list (service dhcp-client-service-type)
+ (services (append (list (simple-service 'e1000-config etc-service-type
+                                         (list `("modprobe.d/e1000.conf" ,e1000-config)))
+                         (service dhcp-client-service-type)
                          (service openssh-service-type)
                          (service accountsservice-service-type)
                          (service elogind-service-type))
@@ -62,13 +68,13 @@
                        (str (read-line port)))
                   (close-pipe port)
                   str)))
-         (target "guixsdvm")
+         (target "guixvm")
          (type luks-device-mapping))))
  (file-systems
   (append
    (map (lambda (item)
              (file-system
-              (device "/dev/mapper/guixsdvm")
+              (device "/dev/mapper/guixvm")
               (mount-point (car item))
               (type "btrfs")
               (options (car (cdr item)))
@@ -98,4 +104,3 @@
    (swap-space
     (target "/swap/swapfile")
     (dependencies file-systems)))))
-
