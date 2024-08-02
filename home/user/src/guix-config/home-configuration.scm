@@ -99,9 +99,9 @@
             (map specification->package+output
                  '("bemenu" "foot" "neofetch" "librewolf" "font-awesome"
                    "wlr-randr" "wl-clipboard" "swaybg" "imv" "sway" "waybar"
-                   "qtwayland" "lxqt-qtplugin" "jq"  "egl-wayland" "xwininfo"
+                   "qtwayland@5.15.10" "lxqt-qtplugin" "jq"  "egl-wayland" "xwininfo"
                    "pcmanfm" "arc-icon-theme" "adwaita-icon-theme"
-                   "zathura" "zathura-pdf-mupdf" "pinentry-emacs"
+                   "qpdfview" "pinentry-emacs"
                    "emacs-next-pgtk" "emacs-pinentry" "emacs-systemd-mode"
                    "emacs-move-text" "emacs-dockerfile-mode" "emacs-pinentry"
                    "emacs-dockerfile-mode" "emacs-avy" "emacs-rust-mode"
