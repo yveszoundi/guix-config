@@ -13,7 +13,7 @@ My initial goal is to contribute to Open Source projects from a Guix environment
   
 * Enable remote installation
 
-After booting the [[https://guix.gnu.org/en/download/][Gnu Guix System ISO image]], please start SSH and setup a non-blank root password.
+After booting the [[https://guix.gnu.org/en/download/][Gnu Guix System ISO image]], please start =SSH= and setup a non-blank root password.
 
 #+begin_src sh
   herd start ssh-daemon
@@ -129,7 +129,7 @@ Let's login as =root= and change that.
 You can now continue the configuration process remotely (=ssh user@localhost -p 62000= in my case).
 
 #+begin_src sh
-  guix pull
+  guix pull --timeout=800 --max-silent-time=800
   sudo guix system reconfigure /etc/config.scm
   reboot
 #+end_src
@@ -150,7 +150,7 @@ Connect to the machine remotely (=ssh user@localhost -p 62000= in my case).
 
 This will setup a minimal [[https://arewewaylandyet.com/][Wayland]] graphical environment with [[https://swaywm.org/][Sway]] (via [[https://guix.gnu.org/manual/devel/en/html_node/Home-Configuration.html][Guix home configuration management]]).
 - It is assumed have you've pulled the contents of this =git= repository on your new Guix installation
-- We'll then be able to quickly have a system up and running
+- You'll then be able to quickly have a system up and running
  
 *As a regular user* (=user= in my case), deploy [[./home/user/src/guix-config/home-configuration.scm][home/user/src/guix-config/home-configuration.scm]].
 
@@ -158,13 +158,13 @@ This will setup a minimal [[https://arewewaylandyet.com/][Wayland]] graphical en
   mkdir -p ~/Downloads ~/.config/guix
   cd ~/Downloads
   git clone https://github.com/yveszoundi/guix-config
-  cp -rf home/user/src ~/
-  cp -rf home/user/Pictures ~/
+  cp -rf guix-config/home/user/src ~/
+  cp -rf guix-config/home/user/Pictures ~/
   guix home reconfigure ~/src/guix-config/home-configuration.scm
   cd -
 #+end_src
 
-After first login in the =tty=, type =sway= on the command-line to start the window manager.
+After first login in the =tty=, type =sway= on the command-line to start the wayland compositor.
 
 * Additional notes
   
