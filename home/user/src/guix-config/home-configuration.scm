@@ -45,7 +45,7 @@
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "1kcvvaizggzi7s3dlh611bkirdf6y89kzddc273drdks705s01wh"))))
+                "17az6xh572ndk1baghyxfdgav4s62q5jji89aphrnx892jk3mpga"))))
      (build-system emacs-build-system)
      (home-page "https://github.com/yveszoundi/emacs-rimero-theme")
      (synopsis "A dark emacs theme that is easy on the eyes.")
