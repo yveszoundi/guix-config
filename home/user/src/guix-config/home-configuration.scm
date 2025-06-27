@@ -69,28 +69,31 @@
                 "0q8ly3f0wxkx4bwall6fj3842mb8p2d008h5flcagc5cs69fzh88"))))
      (build-system cargo-build-system)
      (arguments
-      `(#:cargo-inputs
-        (("rust-clap"            ,rust-clap-3)
-         ("rust-nix"             ,rust-nix-0.26)
-         ("rust-rustls"          ,rust-rustls-0.20)
-         ("rust-wayland-sys"     ,rust-wayland-sys-0.28)
-         ("rust-wayland-scanner" ,rust-wayland-scanner-0.28)
-         ("rust-dirs"            ,rust-dirs-4)
-         ("rust-xml-rs"          ,rust-xml-rs-0.8)
-         ("rust-wl-clipboard-rs" ,rust-wl-clipboard-rs-0.4)
-         ("rust-serde"           ,rust-serde-1)
-         ("rust-serde-derive"    ,rust-serde-derive-1)
-         ("rust-toml"            ,rust-toml-0.5))))
-     (native-inputs
-      `(("perl" ,perl)
-        ("pkg-config" ,pkg-config)))
-     (home-page
-      "https://github.com/yveszoundi/rclip")
-     (synopsis
-      "Share clipboard text over a network.")
-     (description
-      "Simple clipboard utility for sharing text over a network.")
-     (license license:gpl3+))))
+    `(#:cargo-inputs
+      (("rust-clap"            ,rust-clap-3)
+       ("rust-rustls"          ,rust-rustls-0.21)
+       ("rust-dirs"            ,rust-dirs-4)
+       ("rust-wl-clipboard-rs" ,rust-wl-clipboard-rs-0.8)
+       ("rust-serde"           ,rust-serde-1)
+       ("rust-serde-derive"    ,rust-serde-derive-1)
+       ("rust-toml"            ,rust-toml-0.5))))
+   (native-inputs
+    `(("perl" ,perl)
+      ("wayland" ,wayland)
+      ("wlroots" ,wlroots)
+      ("wayland-protocols" ,wayland-protocols)
+      ("perl" ,perl)
+      ("pkg-config" ,pkg-config)))
+   (inputs
+    `(("openssl" ,openssl)))
+   (home-page
+    "https://github.com/yveszoundi/guix-rclip-client-cli-wayland")
+   (synopsis
+    "Share clipboard text over a network.")
+   (description
+    "Simple clipboard utility for sharing text over a network.")
+   (license license:gpl3))))
+     
 
 (home-environment
  ;; Below is the list of packages that will show up in your
