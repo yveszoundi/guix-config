@@ -11,6 +11,7 @@
              (gnu packages tls)
              (gnu packages pkg-config)
              (gnu packages perl)
+             (gnu packages qt)
              (gnu packages crates-io)
              (gnu packages crates-tls)
              (gnu packages wm)
@@ -32,7 +33,7 @@
              (guix build-system emacs))
 
 (define emacs-rimero-theme
-  (let ((commit "a2e706c2b34f749019979a133f08a2d94a1104b3"))
+  (let ((commit "a1a4bd59c54d27f71fa398885da8c3e3db48ebad"))
     (package
      (name "emacs-rimero-theme")
      (version (string-append "0.0.5" "-" (string-take commit 8)))
@@ -53,7 +54,7 @@
      (license license:gpl3+))))
 
 (define rclip-client-cli
-  (let ((commit "35942b1735a307759bfa6ac9eeb07a740044b96a"))
+  (let ((commit "e22c0d5c65383f9fd38356c526665fb7d7d248e6"))
     (package
      (name "rclip-client-cli")
      (version (string-append "1.0.3" "-" (string-take commit 8)))
@@ -99,9 +100,10 @@
             (map specification->package+output
                  '("bemenu" "foot" "neofetch" "librewolf" "font-awesome"
                    "wlr-randr" "wl-clipboard" "swaybg" "imv" "sway" "waybar"
-                   "qtwayland@5.15.10" "lxqt-qtplugin" "jq"  "egl-wayland" "xwininfo"
+                   "qtwayland@5.15.15" "lxqt-qtplugin" "jq"  "egl-wayland" "xwininfo"
                    "pcmanfm" "arc-icon-theme" "adwaita-icon-theme"
                    "qpdfview" "pinentry-emacs"
+                   "secrets"
                    "emacs-next-pgtk" "emacs-pinentry" "emacs-systemd-mode"
                    "emacs-move-text" "emacs-dockerfile-mode" "emacs-pinentry"
                    "emacs-dockerfile-mode" "emacs-avy" "emacs-rust-mode"
