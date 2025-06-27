@@ -66,7 +66,7 @@
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "0q8ly3f0wxkx4bwall6fj3842mb8p2d008h5flcagc5cs69fzh88"))))
+                "1cymfm5fda055b1r7qb8v4f6ps7zm76r8myy7gakbyi56zkxzkmf"))))
      (build-system cargo-build-system)
      (arguments
     `(#:cargo-inputs
