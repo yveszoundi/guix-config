@@ -26,7 +26,7 @@
                (comment "Guix user")
                (group "users")
                (home-directory "/home/user")
-               (shell #~(string-append #$oksh "/bin/ksh"))
+               (shell #~(string-append #$oksh "/bin/oksh"))
                (supplementary-groups
                 '("wheel" "netdev" "input" "kvm" "cdrom" "audio" "video" "tty")))
               %base-user-accounts))
@@ -34,9 +34,10 @@
                         '("screen"
                           "oksh"
                           "git-minimal"
+                          "glibc-locales"
                           "rsync"
                           "btrfs-progs"
-                          "nss-certs"
+                          "nss-certs" ;; TODO: test and remove as it is included in base packages
                           "gnupg"
                           "curl"
                           "polkit"
@@ -49,7 +50,7 @@
                    %base-packages))
  (services (append (list (simple-service 'e1000-config etc-service-type
                                          (list `("modprobe.d/e1000.conf" ,e1000-config)))
-                         (service dhcp-client-service-type)
+                         (service dhcp-client-service-type) ;; TODO: deprecated in favor of dhcpd-service-type
                          (service openssh-service-type)
                          (service accountsservice-service-type)
                          (service elogind-service-type))
