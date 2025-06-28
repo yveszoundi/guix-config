@@ -106,7 +106,6 @@
                    "qtwayland@5.15.15" "lxqt-qtplugin" "jq"  "egl-wayland" "xwininfo"
                    "pcmanfm" "arc-icon-theme" "adwaita-icon-theme"
                    "qpdfview" "pinentry-emacs"
-                   "secrets"
                    "emacs-next-pgtk" "emacs-pinentry" "emacs-systemd-mode"
                    "emacs-move-text" "emacs-dockerfile-mode" "emacs-pinentry"
                    "emacs-dockerfile-mode" "emacs-avy" "emacs-rust-mode"

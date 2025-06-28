@@ -10,10 +10,16 @@ This document describes my [[https://guix.gnu.org/][Gnu Guix System]] setup for 
 My initial goal is to contribute to Open Source projects from a Guix environment.
 - My main machine runs few dedicated virtual machines (VM) a la [[https://www.qubes-os.org/intro/][Qubes OS]] (=vault-vm=, =personal-vm=, =dev-vm=, etc.)
 - =Gnu Guix System= would be dedicated to open source contributions
-  
+
+*Notes*:
+- Configuration files of this repository are meant to remain simple for general guidance.
+- You can fork this repository and customize further the set of software packages that you like on top other personal preferences.
+
 * Enable remote installation
 
-After booting the [[https://guix.gnu.org/en/download/][Gnu Guix System ISO image]], please start =SSH= and setup a non-blank root password.
+After booting the [[https://guix.gnu.org/en/download/][Gnu Guix System ISO image]], elect to drop into a shell after selecting your language and location.
+
+Please start =SSH= and setup a non-blank root password.
 
 #+begin_src sh
   herd start ssh-daemon
@@ -24,7 +30,7 @@ After booting the [[https://guix.gnu.org/en/download/][Gnu Guix System ISO image
 
 You can "ssh into" the Gnu Guix System installation: =ssh root@ip_here -p port_here=.
 
-For new installations with =QEMU=, I typically [[https://serverfault.com/questions/704294/qemu-multiple-port-forwarding][forward port]] 22 to a fixed port number.
+During new installations with =QEMU=, I typically [[https://serverfault.com/questions/704294/qemu-multiple-port-forwarding][forward port]] =22= to a fixed port number (e.g., =62000=).
 
 For my personal setup, I'm using =ssh root@localhost -p 62000=.
 
@@ -35,7 +41,7 @@ Create 2 partitions by running =cgdisk /dev/sda= (in my case)
 - Setup the EFI partition (code =ef00=) of 300 MB (=/dev/sda1= in my case)
 - Setup the Linux partition (default code) with the remaining disk space (=/dev/sda2= in my case)
 
-Write changes to disk and quit =cgdisk=.
+=Write= changes to disk and then =Quit= the =cgdisk= interface.
 
 ** Create an encrypted device
 
@@ -164,15 +170,13 @@ This will setup a minimal [[https://arewewaylandyet.com/][Wayland]] graphical en
   cd -
 #+end_src
 
-After first login in the =tty=, type =sway= on the command-line to start the wayland compositor.
+After first login in the =tty=, type =sway= on the command-line to start the Wayland compositor.
 
 * Additional notes
   
-** Dev environment setup
+** VPN on the host
 
-I only conceptually understand how to setup a custom environment (=guix shell=):
-- How easy is it to setup one-off environments for non-trivial projects (rust, java, nodejs, c/c++, etc.)?
-- How should I manage GC and snapshots in the future?
+I've been having internet issues inside a Guix VM while running a certain VPN software on the host machine.
   
 ** QEMU parameters
 
