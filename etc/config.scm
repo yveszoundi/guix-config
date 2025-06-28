@@ -26,7 +26,7 @@
                (comment "Guix user")
                (group "users")
                (home-directory "/home/user")
-               (shell #~(string-append #$oksh "/bin/oksh"))
+               (shell (file-append oksh "/bin/oksh"))
                (supplementary-groups
                 '("wheel" "netdev" "input" "kvm" "cdrom" "audio" "video" "tty")))
               %base-user-accounts))
