@@ -13,9 +13,6 @@
 (define %device-partition-efi  "/dev/sda1")
 (define %device-partition-root "/dev/sda2")
 
-(define e1000-config
-  (plain-file "e1000.conf" "alias eth0 e1000"))
-
 (operating-system
  (locale "en_US.utf8")
  (timezone "America/Toronto")
@@ -37,7 +34,6 @@
                           "glibc-locales"
                           "rsync"
                           "btrfs-progs"
-                          "nss-certs" ;; TODO: test and remove as it is included in base packages
                           "gnupg"
                           "curl"
                           "polkit"
@@ -48,9 +44,12 @@
                           "libusb"
                           "dosfstools"))
                    %base-packages))
- (services (append (list (simple-service 'e1000-config etc-service-type
-                                         (list `("modprobe.d/e1000.conf" ,e1000-config)))
-                         (service dhcp-client-service-type) ;; TODO: deprecated in favor of dhcpd-service-type
+ (services (append (list (service dhcpcd-service-type
+			   (dhcpcd-configuration
+				(option '("rapid_commit" "interface_mtu"))
+				(no-option '("nd_rdnss" "dhcp6_name_servers" "domain_name" "domain_search"))
+				(static '("domain_name_servers=8.8.8.8"))
+				(no-hook '("hostname"))))
                          (service openssh-service-type)
                          (service accountsservice-service-type)
                          (service elogind-service-type))
