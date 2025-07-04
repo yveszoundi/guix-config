@@ -174,9 +174,9 @@ After first login in the =tty=, type =sway= on the command-line to start the Way
 
 * Additional notes
   
-** VPN on the host
+** Mullvad VPN on the host
 
-I've been having internet issues inside a Guix VM while running a certain VPN software on the host machine.
+If specifically using Mullvad VPN on the host machine, you might run into internet connectivity issues inside the Guix virtual machine. In such a case, create a file at =/etc/resolv.conf.head= with the line =nameserver 10.64.0.1=. See also [[https://mullvad.net/en/help/running-wireguard-router][running-wireguard-router]].
   
 ** QEMU parameters
 

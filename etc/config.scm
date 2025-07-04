@@ -47,8 +47,7 @@
  (services (append (list (service dhcpcd-service-type
 			   (dhcpcd-configuration
 				(option '("rapid_commit" "interface_mtu"))
-				(no-option '("nd_rdnss" "dhcp6_name_servers" "domain_name" "domain_search"))
-				(static '("domain_name_servers=8.8.8.8"))
+				(no-option '("nd_rdnss" "domain_name"))
 				(no-hook '("hostname"))))
                          (service openssh-service-type)
                          (service accountsservice-service-type)
