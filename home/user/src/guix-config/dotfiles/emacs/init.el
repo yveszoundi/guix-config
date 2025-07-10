@@ -66,6 +66,12 @@
  '(ring-bell-function 'ignore)
  '(sgml-basic-offset 2)
  '(show-paren-mode t)
+ '(recentf-exclude '("/tmp" "/ssh:" "\\ido.last" "recentf"))
+ '(recentf-keep '(file-remote-p file-readable-p))
+ '(recentf-max-menu-items 100)
+ '(recentf-max-saved-items 100)
+ '(recentf-mode t)
+ '(recentf-save-file "~/.emacs.d/etc/recentf")
  '(smartrep-mode-line-active-bg (solarized-color-blend "#70b433" "#252525" 0.2))
  '(tab-width 4)
  '(term-default-bg-color "#181818")
@@ -426,9 +432,11 @@
   (global-set-key (kbd "<mouse-4>") #'scroll-down-line)
   (global-set-key (kbd "<mouse-5>") #'scroll-up-line))
 
+;;;; xclip
 (eval-after-load 'xclip
   (progn
     (require 'xclip)
     '(add-hook 'after-init-hook #'xclip-mode)))
 
-(load-theme 'rimero t)
+;;;; theme
+(load-theme 'rimero-dark t)
