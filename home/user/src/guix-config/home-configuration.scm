@@ -92,8 +92,7 @@
     "Share clipboard text over a network.")
    (description
     "Simple clipboard utility for sharing text over a network.")
-   (license license:gpl3))))
-     
+   (license license:gpl3))))     
 
 (home-environment
  ;; Below is the list of packages that will show up in your
