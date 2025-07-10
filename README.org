@@ -7,13 +7,13 @@ This document describes my [[https://guix.gnu.org/][Gnu Guix System]] setup for 
   - The user specific software packages include [[https://swaywm.org/][Sway]] ([[https://i3wm.org/][i3]] for =Wayland=), [[https://librewolf.net/][Librewolf]]. See [[./home/user/src/guix-config/home-configuration.scm][home/user/src/guix-config/home-configuration.scm]]
   - =Sway= is configured with Ratpoison-like keybindings (=C-t= prefix)
 
-My initial goal is to contribute to Open Source projects from a Guix environment.
-- My main machine runs few dedicated virtual machines (VM) a la [[https://www.qubes-os.org/intro/][Qubes OS]] (=vault-vm=, =personal-vm=, =dev-vm=, etc.)
+My goal is to contribute to Open Source projects from a Guix environment.
+- My main machine runs few virtual machines a la [[https://www.qubes-os.org/intro/][Qubes OS]] (=vault-vm=, =personal-vm=, etc.)
 - =Gnu Guix System= would be dedicated to open source contributions
 
 *Notes*:
-- Configuration files of this repository are meant to remain simple for general guidance.
-- You can fork this repository and customize further the set of software packages that you like on top other personal preferences.
+- Configuration files of this repository are meant to "approachable"
+- You can fork this repository and customize further the set of packages that you like and so on
 
 * Enable remote installation
 
@@ -177,10 +177,10 @@ After first login in the =tty=, type =sway= on the command-line to start the Way
 ** Mullvad VPN on the host
 
 If specifically using Mullvad VPN on the host machine, you might run into internet connectivity issues inside the Guix virtual machine. In such a case, create a file at =/etc/resolv.conf.head= with the line =nameserver 10.64.0.1=. See also [[https://mullvad.net/en/help/running-wireguard-router][running-wireguard-router]].
-  
-** QEMU parameters
 
-If the UI doesn't start, the QEMU parameter =-vga qxl= seems to avoid issues with Wayland drivers/renderers.
+** Initial update upon installation
+
+It is probably a good idea to run =guix pull= prior installating the system to fetch immediately latest updates (configuration file discrepancies over time, etc.). I haven't tried that yet though.
 
 * References
 
