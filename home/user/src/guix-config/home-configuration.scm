@@ -78,12 +78,12 @@
        ("rust-serde-derive"    ,rust-serde-derive-1)
        ("rust-toml"            ,rust-toml-0.5))))
    (native-inputs
-    `(("perl" ,perl)
-      ("wayland" ,wayland)
-      ("wlroots" ,wlroots)
+    `(("perl"              ,perl)
+      ("wayland"           ,wayland)
+      ("wlroots"           ,wlroots)
       ("wayland-protocols" ,wayland-protocols)
-      ("perl" ,perl)
-      ("pkg-config" ,pkg-config)))
+      ("perl"              ,perl)
+      ("pkg-config"        ,pkg-config)))
    (inputs
     `(("openssl" ,openssl)))
    (home-page
@@ -102,7 +102,7 @@
             (map specification->package+output
                  '("bemenu" "foot" "neofetch" "librewolf" "font-awesome"
                    "wlr-randr" "wl-clipboard" "swaybg" "imv" "sway" "waybar"
-                   "qtwayland@5.15.15" "lxqt-qtplugin" "jq"  "egl-wayland" "xwininfo"
+                   "qtwayland@5" "lxqt-qtplugin" "jq"  "egl-wayland" "xwininfo"
                    "pcmanfm" "arc-icon-theme" "adwaita-icon-theme"
                    "qpdfview" "pinentry-emacs"
                    "emacs-next-pgtk" "emacs-pinentry" "emacs-systemd-mode"
