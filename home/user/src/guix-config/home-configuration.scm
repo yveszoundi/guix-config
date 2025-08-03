@@ -103,7 +103,7 @@
                  '("bemenu" "foot" "neofetch" "librewolf" "font-awesome"
                    "wlr-randr" "wl-clipboard" "swaybg" "imv" "sway" "waybar"
                    "qtwayland@5" "lxqt-qtplugin" "jq"  "egl-wayland" "xwininfo"
-                   "pcmanfm" "arc-icon-theme" "adwaita-icon-theme"
+                   "arc-icon-theme" "adwaita-icon-theme"
                    "qpdfview" "pinentry-emacs"
                    "emacs-next-pgtk" "emacs-pinentry" "emacs-systemd-mode"
                    "emacs-move-text" "emacs-dockerfile-mode" "emacs-pinentry"
