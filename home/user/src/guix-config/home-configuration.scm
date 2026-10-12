@@ -14,13 +14,14 @@
              (gnu packages qt)
              (gnu packages crates-io)
              (gnu packages crates-tls)
-             (gnu packages wm)
+             (gnu packages window-management)
              (gnu packages crates-graphics)
              (gnu packages freedesktop)
              (gnu packages xdisorg)
              (gnu packages image)
              (gnu services)
              (gnu home services)
+             (gnu home services xdg)
              (gnu home services shells)
              (guix gexp)
              (guix utils)
@@ -69,30 +70,33 @@
                 "1cymfm5fda055b1r7qb8v4f6ps7zm76r8myy7gakbyi56zkxzkmf"))))
      (build-system cargo-build-system)
      (arguments
-    `(#:cargo-inputs
-      (("rust-clap"            ,rust-clap-3)
-       ("rust-rustls"          ,rust-rustls-0.21)
-       ("rust-dirs"            ,rust-dirs-4)
-       ("rust-wl-clipboard-rs" ,rust-wl-clipboard-rs-0.8)
-       ("rust-serde"           ,rust-serde-1)
-       ("rust-serde-derive"    ,rust-serde-derive-1)
-       ("rust-toml"            ,rust-toml-0.5))))
-   (native-inputs
-    `(("perl"              ,perl)
-      ("wayland"           ,wayland)
-      ("wlroots"           ,wlroots)
-      ("wayland-protocols" ,wayland-protocols)
-      ("perl"              ,perl)
-      ("pkg-config"        ,pkg-config)))
-   (inputs
-    `(("openssl" ,openssl)))
-   (home-page
-    "https://github.com/yveszoundi/guix-rclip-client-cli-wayland")
-   (synopsis
-    "Share clipboard text over a network.")
-   (description
-    "Simple clipboard utility for sharing text over a network.")
-   (license license:gpl3))))     
+      (list #:cargo-test-flags '#~'("--release")))
+      ;; `(#:cargo-inputs 
+      ;;   `(("rust-clap"            ,rust-clap-3)
+      ;;    ("rust-rustls"          ,rust-rustls-0.21)
+      ;;    ("rust-dirs"            ,rust-dirs-4)
+      ;;    ("rust-wl-clipboard-rs" ,rust-wl-clipboard-rs-0.8)
+      ;;    ("rust-serde"           ,rust-serde-1)
+      ;;    ("rust-serde-derive"    ,rust-serde-derive-1)
+      ;;    ("rust-toml"            ,rust-toml-0.5)))
+     (native-inputs
+      `(("perl" ,perl)
+        ("wayland" ,wayland)
+        ("wlroots" ,wlroots)
+        ("wayland-protocols" ,wayland-protocols)
+        ("perl" ,perl)
+        ("pkg-config" ,pkg-config)))     
+     (inputs
+      (cons* openssl
+             (cargo-inputs-from-lockfile "Cargo.lock")))
+     ;; (inputs `(("openssl" ,openssl)))
+     (home-page
+      "https://github.com/yveszoundi/guix-rclip-client-cli-wayland")
+     (synopsis
+      "Share clipboard text over a network.")
+     (description
+      "Simple clipboard utility for sharing text over a network.")
+     (license license:gpl3))))
 
 (home-environment
  ;; Below is the list of packages that will show up in your
@@ -104,17 +108,24 @@
                    "wlr-randr" "wl-clipboard" "swaybg" "imv" "sway" "waybar"
                    "qtwayland@5" "lxqt-qtplugin" "jq"  "egl-wayland" "xwininfo"
                    "arc-icon-theme" "adwaita-icon-theme"
-                   "qpdfview" "pinentry-emacs"
-                   "emacs-next-pgtk" "emacs-pinentry" "emacs-systemd-mode"
-                   "emacs-move-text" "emacs-dockerfile-mode" "emacs-pinentry"
-                   "emacs-dockerfile-mode" "emacs-avy" "emacs-rust-mode"
-                   "emacs-xclip" "emacs-markdown-mode" "emacs-jinja2-mode"
-                   "emacs-rainbow-mode" "emacs-markdown-mode" "emacs-yaml-mode"))
-            (list emacs-rimero-theme rclip-client-cli)))
+                   "qpdfview" "pinentry-emacs" 
+                   "emacs-next-pgtk" "emacs-xclip" "emacs-markdown-mode" "emacs-rainbow-mode" "emacs-yaml-mode" "emacs-rust-mode" "emacs-dockerfile-mode" "emacs-avy" "emacs-pinentry"))
+            ;;(list emacs-rimero-theme rclip-client-cli)))
+            (list emacs-rimero-theme)))
  ;; Below is the list of Home services.  To search for available
  ;; services, run 'guix home search KEYWORD' in a terminal.
  (services
   (list
+   (simple-service 'xdg-user-directories-config-service home-xdg-user-directories-service-type
+                   (home-xdg-user-directories-configuration
+                    (desktop     "$HOME/Desktop")
+                    (documents   "$HOME/Documents")
+                    (download    "$HOME/Downloads")
+                    (music       "$HOME/Music")
+                    (pictures    "$HOME/Pictures")
+                    (publicshare "$HOME/Public")
+                    (templates   "$HOME/Templates")
+                    (videos      "$HOME/Videos")))
    (simple-service 'some-useful-env-vars-service
                    home-environment-variables-service-type
                    `(("TERM"                        . "xterm-256color")
@@ -134,7 +145,7 @@
                    home-files-service-type
                    `((".config/foot/foot.ini" ,(local-file "dotfiles/foot/foot.ini"))
                      (".config/sway/config" ,(local-file "dotfiles/sway/config"))
-                     (".kshrc" ,(local-file "dotfiles/ksh/kshrc"))                     
+                     (".kshrc" ,(local-file "dotfiles/ksh/kshrc"))
                      (".local/bin/xwrap"
                       ,(local-file "dotfiles/x11/xwrap.sh" #:recursive? #t))
                      (".local/share/rclip/der-cert-pub.der"
