@@ -54,23 +54,23 @@
       "Theme with a dark background suitable for UI and terminal usage.")
      (license license:gpl3+))))
 
-(define rclip-client-cli
-  (let ((commit "e22c0d5c65383f9fd38356c526665fb7d7d248e6"))
-    (package
-     (name "rclip-client-cli")
-     (version (string-append "1.0.3" "-" (string-take commit 8)))
-     (source (origin
-              (method git-fetch)
-              (uri (git-reference
-                    (url "https://github.com/yveszoundi/guix-rclip-client-cli-wayland")
-                    (commit commit)))
-              (file-name (git-file-name name version))
-              (sha256
-               (base32
-                "1cymfm5fda055b1r7qb8v4f6ps7zm76r8myy7gakbyi56zkxzkmf"))))
-     (build-system cargo-build-system)
-     (arguments
-      (list #:cargo-test-flags '#~'("--release")))
+;; (define rclip-client-cli
+;;   (let ((commit "e22c0d5c65383f9fd38356c526665fb7d7d248e6"))
+;;     (package
+;;      (name "rclip-client-cli")
+;;      (version (string-append "1.0.3" "-" (string-take commit 8)))
+;;      (source (origin
+;;               (method git-fetch)
+;;               (uri (git-reference
+;;                     (url "https://github.com/yveszoundi/guix-rclip-client-cli-wayland")
+;;                     (commit commit)))
+;;               (file-name (git-file-name name version))
+;;               (sha256
+;;                (base32
+;;                 "1cymfm5fda055b1r7qb8v4f6ps7zm76r8myy7gakbyi56zkxzkmf"))))
+;;      (build-system cargo-build-system)
+;;      (arguments
+;;       (list #:cargo-test-flags '#~'("--release")))
       ;; `(#:cargo-inputs 
       ;;   `(("rust-clap"            ,rust-clap-3)
       ;;    ("rust-rustls"          ,rust-rustls-0.21)
@@ -79,24 +79,24 @@
       ;;    ("rust-serde"           ,rust-serde-1)
       ;;    ("rust-serde-derive"    ,rust-serde-derive-1)
       ;;    ("rust-toml"            ,rust-toml-0.5)))
-     (native-inputs
-      `(("perl" ,perl)
-        ("wayland" ,wayland)
-        ("wlroots" ,wlroots)
-        ("wayland-protocols" ,wayland-protocols)
-        ("perl" ,perl)
-        ("pkg-config" ,pkg-config)))     
-     (inputs
-      (cons* openssl
-             (cargo-inputs-from-lockfile "Cargo.lock")))
-     ;; (inputs `(("openssl" ,openssl)))
-     (home-page
-      "https://github.com/yveszoundi/guix-rclip-client-cli-wayland")
-     (synopsis
-      "Share clipboard text over a network.")
-     (description
-      "Simple clipboard utility for sharing text over a network.")
-     (license license:gpl3))))
+     ;; (native-inputs
+     ;;  `(("perl" ,perl)
+     ;;    ("wayland" ,wayland)
+     ;;    ("wlroots" ,wlroots)
+     ;;    ("wayland-protocols" ,wayland-protocols)
+     ;;    ("perl" ,perl)
+     ;;    ("pkg-config" ,pkg-config)))     
+     ;; (inputs
+     ;;  (cons* openssl
+     ;;         (cargo-inputs-from-lockfile "Cargo.lock")))
+     ;; ;; (inputs `(("openssl" ,openssl)))
+     ;; (home-page
+     ;;  "https://github.com/yveszoundi/guix-rclip-client-cli-wayland")
+     ;; (synopsis
+     ;;  "Share clipboard text over a network.")
+     ;; (description
+     ;;  "Simple clipboard utility for sharing text over a network.")
+     ;; (license license:gpl3))))
 
 (home-environment
  ;; Below is the list of packages that will show up in your

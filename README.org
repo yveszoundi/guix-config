@@ -12,7 +12,7 @@ My goal is to contribute to Open Source projects from a Guix environment.
 - =Gnu Guix System= would be dedicated to open source contributions
 
 *Notes*:
-- Configuration files of this repository are meant to "approachable"
+- Files of this repository are meant to be "approachable", no "framework"
 - You can fork this repository and customize further the set of packages that you like and so on
 
 * Enable remote installation
