@@ -17,9 +17,7 @@ My goal is to contribute to Open Source projects from a Guix environment.
 
 * Enable remote installation
 
-Sometimes, I perform the installation from another system, especially if I'll run a Linux or BSD distro inside a virtual machine.
-
-After booting the [[https://guix.gnu.org/en/download/][Gnu Guix System ISO image]], elect to drop into a shell after selecting your language and location in the wizard.
+Sometimes, I perform the installation from another system, especially if I'll run a Linux or BSD distro inside a virtual machine. After booting the [[https://guix.gnu.org/en/download/][Gnu Guix System ISO image]], elect to drop into a shell after selecting your language and location in the wizard.
 
 Please start =SSH= and setup a non-blank root password.
 
@@ -30,7 +28,7 @@ Please start =SSH= and setup a non-blank root password.
 
 * Prepare the installation
 
-You can "ssh into" the Gnu Guix System installation: =ssh root@ip_here -p port_here=. (=ifconfig= or =ip a= can help)
+You can "ssh into" the Guix installation: =ssh root@ip_here -p port_here=. (=ifconfig= or =ip a= can help)
 
 During new installations with =QEMU=, I typically [[https://serverfault.com/questions/704294/qemu-multiple-port-forwarding][forward port]] =22= to a fixed port number (e.g., =62000=).
 
