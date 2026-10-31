@@ -179,10 +179,10 @@ This will setup a minimal [[https://arewewaylandyet.com/][Wayland]] graphical en
 After first login in the =tty=, type =sway= on the command-line to start the Wayland compositor.
 
 * Additional notes
-Over the years, I adopted a configuration similar to Qubes OS via compartmentalization with virtual machines (VMs):
+Over the years, I adopted a configuration similar to [[https://www.google.com/goto?url=CAESVAHrOzAVRIwBAXDlsZlNc_D51WYm--omAHBhqa4bzWNRJmr1BOmC9GIJofEcw1wBpbkbGLO-xnSYdyYIRtEjDei_aZ3oNb83Ht7MtuMkEPDicnaMuQ][Qubes OS]] via compartmentalization with virtual machines (VMs):
 - I do almost nothing directly on my core system (administer few things usually in a terminal, launch virtual machines, open a browser)
 - I have dedicated VMs for few things :
-  - Persistent VMs: Those have a full Linux installation (passwords-vm, media-vm, dev-vm, opensource-vm, etc.)
+  - Persistent VMs: Those have a full Linux installation (passwords-vm, media-vm, dev-vm, etc.)
   - Ephemeral VMs: Those a running live CDs ISO images (filesanitizer-vm, anonymous-vm, etc.)
 
 ** VMware Fusion
