@@ -5,7 +5,7 @@ This document describes my [[https://guix.gnu.org/][Gnu Guix System]] setup for 
 - The installation uses [[https://btrfs.readthedocs.io/en/latest/][BTRFS]] instead of [[https://wikiless.org/wiki/Logical_Volume_Manager_(Linux)?lang=en][LVM]], with full disk encryption ([[https://wikiless.org/wiki/Linux_Unified_Key_Setup?lang=en][LUKS]])
 - The core installation itself is minimal
   - The user specific software packages include [[https://swaywm.org/][Sway]] ([[https://i3wm.org/][i3]] for =Wayland=), [[https://librewolf.net/][Librewolf]]. See [[./home/user/src/guix-config/home-configuration.scm][home/user/src/guix-config/home-configuration.scm]]
-  - =Sway= is configured with Ratpoison-like keybindings (=C-t= prefix)
+  - =Sway= is configured with [[https://wiki.archlinux.org/title/Ratpoison][Ratpoison]]-like keybindings (=C-t= prefix)
 
 My goal is to contribute to Open Source projects from a Guix environment.
 - My main machine runs few virtual machines a la [[https://www.qubes-os.org/intro/][Qubes OS]] (=vault-vm=, =personal-vm=, etc.)
@@ -17,7 +17,9 @@ My goal is to contribute to Open Source projects from a Guix environment.
 
 * Enable remote installation
 
-After booting the [[https://guix.gnu.org/en/download/][Gnu Guix System ISO image]], elect to drop into a shell after selecting your language and location.
+Sometimes, I perform the installation from another system, especially if I'll run a Linux or BSD distro inside a virtual machine.
+
+After booting the [[https://guix.gnu.org/en/download/][Gnu Guix System ISO image]], elect to drop into a shell after selecting your language and location in the wizard.
 
 Please start =SSH= and setup a non-blank root password.
 
@@ -28,16 +30,17 @@ Please start =SSH= and setup a non-blank root password.
 
 * Prepare the installation
 
-You can "ssh into" the Gnu Guix System installation: =ssh root@ip_here -p port_here=.
+You can "ssh into" the Gnu Guix System installation: =ssh root@ip_here -p port_here=. (=ifconfig= or =ip a= can help)
 
 During new installations with =QEMU=, I typically [[https://serverfault.com/questions/704294/qemu-multiple-port-forwarding][forward port]] =22= to a fixed port number (e.g., =62000=).
 
 For my personal setup, I'm using =ssh root@localhost -p 62000=.
 
 ** Create partitions
-Identify your disk partitions (=fdisk -l= can help).
+Identify your disk partitions (=lsblk= or =fdisk -l= can help).
 
 Create 2 partitions by running =cgdisk /dev/sda= (in my case)
+- Type =g= to initialize a GPT layout
 - Setup the EFI partition (code =ef00=) of 300 MB (=/dev/sda1= in my case)
 - Setup the Linux partition (default code) with the remaining disk space (=/dev/sda2= in my case)
 
@@ -45,7 +48,7 @@ Create 2 partitions by running =cgdisk /dev/sda= (in my case)
 
 ** Create an encrypted device
 
-Encrypt the main partition.
+Encrypt the main partition (=/dev/sda2= for me).
 
 #+begin_src sh
   cryptsetup luksFormat --type luks1 /dev/sda2
@@ -62,6 +65,10 @@ Open the encrypted device.
 ** Prepare installation
 
 Run all the commands below to configure partitions and setup filesystems.
+
+**Make sure to replace /dev/sda1 by the relevant EFI partition on your system!**
+
+When installing directly on the VM itself instead of SSH, I just extra the command from this file into a shell script (edit the file with =mg=, copy the commands into a new file, make the file executable via =chmod= and run it...).
 
 #+begin_src sh
   mkfs.btrfs -L guixroot /dev/mapper/guixvm
@@ -103,6 +110,7 @@ Edit the [[./etc/config.scm][etc/config.scm]] file as needed (i.e. =efi= and =ro
 
 You need to create the =config.scm= file inside your installation
 - You can add/edit the file on your Guix installation locally or via SSH (with =nano=, =mg= or =vi=)
+- You can also clone this repository after installing git (=guix install git-minimal=)
 - Alternatively, you could also download the raw file from GitHub via =wget= or =curl=
 
 #+begin_src sh
@@ -132,7 +140,7 @@ Let's login as =root= and change that.
 
 ** Update the system
 
-You can now continue the configuration process remotely (=ssh user@localhost -p 62000= in my case).
+You can now continue the configuration process directly or remotely (=ssh user@localhost -p 62000= in my case).
 
 #+begin_src sh
   guix pull --timeout=800 --max-silent-time=800
@@ -173,14 +181,22 @@ This will setup a minimal [[https://arewewaylandyet.com/][Wayland]] graphical en
 After first login in the =tty=, type =sway= on the command-line to start the Wayland compositor.
 
 * Additional notes
-  
+Over the years, I adopted a configuration similar to Qubes OS via compartmentalization with virtual machines (VMs):
+- I do almost nothing directly on my core system (administer few things usually in a terminal, launch virtual machines, open a browser)
+- I have dedicated VMs for few things :
+  - Persistent VMs: Those have a full Linux installation (passwords-vm, media-vm, dev-vm, opensource-vm, etc.)
+  - Ephemeral VMs: Those a running live CDs ISO images (filesanitizer-vm, anonymous-vm, etc.)
+
+** VMware Fusion
+For headless systems with no need for graphical interface, I prefer QEMU as it's fast, easy on RAM and doesn't require involved firewall configs. However, if you want/need a Desktop system, your QEMU build may not have 3D acceleration (e.g., old Intel Macs). On my old iMac Pro (64 GB of RAM), QEMU often freezes or reboot on Linux VMs running with Wayland and =caffeinate= (or other tricks) don't work. 
+
+TODO more clarity
+- Slow boot for UEFI, use =SATA= drop-down option for removable CD containing the ISO, =vmware-open-vm-tools= package, custom =vmware-open-vm-tools= service in =config.scm=
+- For macOS, adjust the firewall to allow traffic to VMware network interfaces (=/etc/pf.conf=), so that you can SSH into VMs among other things
+
 ** Mullvad VPN on the host
 
-If specifically using Mullvad VPN on the host machine, you might run into internet connectivity issues inside the Guix virtual machine. In such a case, create a file at =/etc/resolv.conf.head= with the line =nameserver 10.64.0.1=. See also [[https://mullvad.net/en/help/running-wireguard-router][running-wireguard-router]].
-
-** Initial update upon installation
-
-It is probably a good idea to run =guix pull= prior installating the system to fetch immediately latest updates (configuration file discrepancies over time, etc.). I haven't tried that yet though.
+If specifically using [[https://mullvad.net/en][Mullvad]] VPN on the host machine, you might run into internet connectivity issues inside the Guix virtual machine. In such a case, create a file at =/etc/resolv.conf.head= with the line =nameserver 10.64.0.1=. See also [[https://mullvad.net/en/help/running-wireguard-router][running-wireguard-router]].
 
 * References
 
