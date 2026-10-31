@@ -68,7 +68,7 @@ Run all the commands below to configure partitions and setup filesystems.
 
 **Make sure to replace /dev/sda1 by the relevant EFI partition on your system!**
 
-When installing directly on the VM itself instead of SSH, I just extra the command from this file into a shell script (edit the file with =mg=, copy the commands into a new file, make the file executable via =chmod= and run it...).
+When installing directly on the VM itself instead of SSH, I just extract the command from this file into a shell script (edit the file with =mg=, copy the commands into a new file, make the file executable via =chmod= and run it...).
 
 #+begin_src sh
   mkfs.btrfs -L guixroot /dev/mapper/guixvm
